@@ -14,6 +14,11 @@ make
 
 O arquivo final será `main.pdf`. O diagrama está incorporado no próprio `main.tex`.
 
+> Caso prefira, pode rodar esse comando esse comando na raiz do projeto para conseguir o arquivo final em PDF:
+> ```bash
+> make -C activities/activitie_1
+> ```
+
 ## Organização
 
 - `main.tex`: relatório completo, em português;
