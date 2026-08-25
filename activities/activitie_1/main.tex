@@ -40,6 +40,7 @@
 
 \begin{document}
 
+\hypersetup{pageanchor=false}
 \begin{titlepage}
 \centering
 \vspace*{1cm}
@@ -59,7 +60,9 @@ Este relatório apresenta uma proposta simples de Rede de Sensores Sem Fio (RSSF
 {\large Santa Rita do Sapucaí -- MG\\2026}
 \end{titlepage}
 
+\hypersetup{pageanchor=true}
 \pagenumbering{arabic}
+\twocolumn
 \section*{Resumo}
 \addcontentsline{toc}{section}{Resumo}
 Encontrar uma vaga em regiões movimentadas pode aumentar o tempo de deslocamento, o consumo de combustível e a emissão de poluentes. Este trabalho pesquisa a aplicação de uma Rede de Sensores Sem Fio (RSSF) em estacionamentos inteligentes. A proposta utiliza um sensor em cada vaga para detectar a presença de um veículo, uma rede de comunicação de baixo consumo para transportar as leituras até um gateway e um serviço de software que atualiza um aplicativo. São discutidas alternativas de sensores, tecnologias de comunicação, organização da rede, consumo de energia, confiabilidade e segurança. A RSSF é útil porque permite instalar muitos pontos de medição distribuídos sem exigir cabeamento individual entre todas as vagas, além de possibilitar expansão e manutenção por partes.
@@ -73,8 +76,10 @@ Um estacionamento inteligente transforma a ocupação das vagas em informação 
 
 A aplicação escolhida neste trabalho é, portanto, o monitoramento de vagas de estacionamento com RSSF. A escolha é adequada porque o cenário possui muitos pontos de observação, distribuídos espacialmente, e cada ponto transmite uma pequena quantidade de dados. Esses são requisitos típicos de uma rede de sensores: nós compactos, baixo consumo, comunicação sem fio e processamento distribuído. Trabalhos anteriores descrevem arquiteturas com sensores nas vagas, nós repetidores e um gateway conectado à Internet \cite{bagula2015,chen2016}.
 
+Além da literatura científica, a proposta parte de experiências práticas anteriores dos autores. O primeiro autor participou do desenvolvimento do protótipo ParkingGO, apresentado na 40ª FETIN, que utilizava sensores de presença, sinalização por LEDs e um painel central para indicar vagas disponíveis \cite{ribeiro2021parkinggo}. O segundo autor participou do desenvolvimento do ParkHere, apresentado na 43ª FETIN, que combinava visão computacional em uma Raspberry Pi, MQTT, banco de dados, API em Python e aplicativo Android para monitorar vagas e veículos \cite{silva2024parkhere}. Essas experiências de prototipagem motivam a arquitetura de RSSF analisada neste trabalho, cuja validação depende do piloto descrito adiante.
+
 \section{Por que utilizar uma RSSF?}
-Uma RSSF é formada por vários nós sensores capazes de medir uma grandeza física, processar uma leitura e enviá-la por rádio. No estacionamento, a grandeza de interesse é a ocupação da vaga. O dado pode ser representado de maneira simples como $não-ocupada = 0$ ou $ocupada = 1$, acompanhado do identificador da vaga e do horário da medição. Essa organização permite distribuir a detecção e concentrar as leituras em um gateway conectado ao serviço de informação \cite{bagula2015,hilmani2018}.
+Uma RSSF é formada por vários nós sensores capazes de medir uma grandeza física, processar uma leitura e enviá-la por rádio. No estacionamento, a grandeza de interesse é a ocupação da vaga. O dado pode ser representado de maneira simples como \texttt{não-ocupada = 0} ou \texttt{ocupada = 1}, acompanhado do identificador da vaga e do horário da medição. Essa organização permite distribuir a detecção e concentrar as leituras em um gateway conectado ao serviço de informação \cite{bagula2015,hilmani2018}.
 
 Há cinco vantagens principais para esse cenário:
 \begin{enumerate}[label=\arabic*.,leftmargin=1cm]
@@ -90,7 +95,7 @@ Além de ajudar o motorista, a solução fornece ao administrador indicadores de
 \section{Arquitetura proposta}
 Para tornar a proposta concreta, considera-se uma garagem coberta com 100 vagas, dividida em cinco setores de 20 vagas. Cada vaga recebe um nó com sensor ultrassônico, microcontrolador, rádio IEEE 802.15.4/Zigbee e fonte de energia. Um roteador alimentado pela rede elétrica atende cada setor, enquanto os nós das vagas podem permanecer em baixo consumo entre as leituras. Os roteadores encaminham os eventos ao gateway coordenador, que usa Ethernet ou Wi-Fi para alcançar o servidor. A divisão em setores reduz a distância dos enlaces e facilita a expansão e a manutenção. Arquiteturas semelhantes, com nós de detecção, roteamento e gateway, são discutidas em \cite{bagula2015,hilmani2018}.
 
-\begin{figure}[ht]
+\begin{figure*}[t]
 \centering
 \begin{tikzpicture}[
 node distance=0.65cm and 0.85cm,
@@ -115,7 +120,7 @@ arrow/.style={-{Latex[length=2mm]}, thick, draw=azul}
 \end{tikzpicture}
 \caption{Arquitetura adotada para o estacionamento de referência.}
 \label{fig:arquitetura}
-\end{figure}
+\end{figure*}
 
 \subsection{Funcionamento de um nó sensor}
 O microcontrolador mantém o nó em modo de baixo consumo e acorda a cada cinco segundos. Ao acordar, mede a distância até o piso ou o veículo e compara o resultado com um limiar calibrado durante a instalação. Duas leituras consecutivas no mesmo estado confirmam a mudança de livre para ocupado ou de ocupado para livre. O nó então transmite um evento no formato \texttt{ID\_VAGA, ESTADO, BATERIA, SEQUENCIA}.
@@ -125,7 +130,7 @@ Uma confirmação do gateway evita que uma perda de pacote deixe o aplicativo co
 \subsection{Comunicação e topologia}
 Em um estacionamento pequeno, uma topologia estrela pode ser suficiente: todos os nós comunicam diretamente com o gateway. Em estacionamentos grandes ou subterrâneos, uma topologia em árvore ou malha pode usar nós repetidores para contornar obstáculos. A seleção da tecnologia depende da distância, do número de vagas, da existência de energia elétrica e da necessidade de latência.
 
-\begin{table}[ht]
+\begin{table*}[t]
 \centering
 \small
 \caption{Alternativas de comunicação para a RSSF.}
@@ -140,9 +145,9 @@ BLE Mesh & Baixo custo e integração com dispositivos próximos & Ambientes men
 Wi-Fi & Alta disponibilidade e maior taxa de dados & Gateway, câmeras ou locais com alimentação contínua \\
 \bottomrule
 \end{tabularx}
-\end{table}
+\end{table*}
 
-O cenário de referência adota IEEE 802.15.4/Zigbee porque a garagem possui área limitada, muitos nós próximos e roteadores alimentados por setor. O gateway atua como coordenador da rede local. Wi-Fi ou Ethernet são usados somente entre o gateway e o servidor, evitando manter todos os sensores conectados diretamente a uma rede de maior consumo. Hilmani, Maizate e Hassouni também apontam a adequação do Zigbee a redes de estacionamento com comunicação curta e baixo consumo \cite{hilmani2018}.
+O cenário de referência adota Zigbee (IEEE 802.15.4) porque a garagem possui área limitada, muitos nós próximos e roteadores alimentados por setor. O gateway atua como coordenador da rede local. Wi-Fi ou Ethernet são usados somente entre o gateway e o servidor, evitando manter todos os sensores conectados diretamente a uma rede de maior consumo. Hilmani, Maizate e Hassouni também apontam a adequação do Zigbee a redes de estacionamento com comunicação curta e baixo consumo \cite{hilmani2018}.
 
 \section{Sensores que podem ser utilizados}
 Não existe um único sensor ideal para todos os estacionamentos. O modelo deve considerar preço, precisão, instalação, manutenção, interferência e condições ambientais. A literatura de estacionamentos inteligentes apresenta soluções com sensores magnéticos, ultrassônicos, infravermelhos, luminosos e RFID \cite{chen2016,hilmani2018}.
@@ -162,7 +167,7 @@ Sensores piezoelétricos, células de carga ou tapetes de pressão detectam a fo
 \subsection{Câmera e RFID como recursos complementares}
 Câmeras podem confirmar visualmente a ocupação, ler placas ou identificar situações especiais. Porém, demandam mais energia, processamento e cuidados com privacidade. Por isso, uma alternativa eficiente é usar o sensor simples em cada vaga e deixar a câmera apenas em pontos de verificação. RFID não detecta sozinho a presença de qualquer veículo, mas pode identificar veículos autorizados em entradas, saídas ou vagas reservadas. Arquiteturas com sensores de vaga, leitores RFID e gateway são discutidas em \cite{bagula2015,hilmani2018}.
 
-\begin{table}[ht]
+\begin{table*}[t]
 \centering
 \small
 \caption{Comparação simplificada dos sensores.}
@@ -177,7 +182,7 @@ Pressão & Detecta diretamente o peso & Desgaste e obra no piso & Vaga dedicada 
 Câmera & Vários tipos de análise & Privacidade e energia & Verificação pontual \\
 \bottomrule
 \end{tabularx}
-\end{table}
+\end{table*}
 
 \section{Implementação e fluxo de dados}
 O desenvolvimento começa com um piloto em dez vagas de um único setor. Nessa etapa são calibrados os limiares dos sensores e medidos falsos positivos, falsos negativos, alcance do rádio e consumo médio. Após a validação, a instalação é ampliada para os cinco setores, cada um com 20 nós finais e um roteador. Essa implantação incremental reduz o risco de repetir em 100 vagas um problema de posicionamento ou cobertura \cite{bagula2015}.
@@ -196,7 +201,7 @@ Os benefícios esperados são menor tempo de procura, melhor aproveitamento da i
 
 As principais limitações são o custo inicial, a necessidade de manutenção, a interferência de estruturas metálicas, a cobertura de rádio e a possibilidade de leituras incorretas. A RSSF não elimina a necessidade de sinalização física: o motorista ainda precisa identificar a vaga e respeitar regras de acessibilidade e segurança.
 
-Uma avaliação objetiva deve medir: (i) acurácia da classificação livre/ocupada; (ii) tempo entre a mudança real e a atualização no aplicativo; (iii) taxa de entrega de pacotes; (iv) consumo de energia e vida útil estimada; (v) disponibilidade do serviço; e (vi) custo por vaga. Como metas iniciais, o piloto deve buscar acurácia mínima de 95\%, atualização em até 15 segundos e entrega de pelo menos 99\% dos eventos. As metas devem ser verificadas com, no mínimo, 100 eventos reais de entrada e saída, em diferentes vagas e condições de iluminação. Chen et al. demonstram a importância de avaliar conjuntamente sensores, implantação e distribuição da informação aos usuários \cite{chen2016}.
+Uma avaliação objetiva deve medir: (i) acurácia da classificação de vagas como livres ou ocupadas; (ii) tempo entre a mudança real e a atualização no aplicativo; (iii) taxa de entrega de pacotes; (iv) consumo de energia e vida útil estimada; (v) disponibilidade do serviço; e (vi) custo por vaga. Como metas iniciais, o piloto deve buscar acurácia mínima de 95\%, atualização em até 15 segundos e entrega de pelo menos 99\% dos eventos. As metas devem ser verificadas com, no mínimo, 100 eventos reais de entrada e saída, em diferentes vagas e condições de iluminação. Chen et al. demonstram a importância de avaliar conjuntamente sensores, implantação e distribuição da informação aos usuários \cite{chen2016}.
 
 \section{Conclusão}
 O estacionamento inteligente é uma aplicação natural para RSSF porque transforma eventos simples e distribuídos em informação útil. No cenário de 100 vagas cobertas, a solução adotada combina sensores ultrassônicos, IEEE 802.15.4/Zigbee, cinco roteadores, gateway, servidor e aplicativo.
