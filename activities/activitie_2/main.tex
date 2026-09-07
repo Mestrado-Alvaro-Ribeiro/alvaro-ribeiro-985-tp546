@@ -1,0 +1,213 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,backgrounds}
+\usepackage[hidelinks]{hyperref}
+
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0.15em}
+\definecolor{azul}{RGB}{26,76,122}
+\definecolor{verde}{RGB}{42,122,77}
+\definecolor{cinza}{RGB}{242,245,247}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\title{\textbf{Internet das Coisas na agricultura: estudo de caso de irrigação de precisão com LoRaWAN}}
+\author{Álvaro Lucio Almeida Ribeiro\\Matheus Henrique Fonseca Afonso}
+\date{2026}
+\hypersetup{
+    pdftitle={Internet das Coisas na agricultura: estudo de caso de irrigação de precisão com LoRaWAN},
+    pdfauthor={Álvaro Lucio Almeida Ribeiro; Matheus Henrique Fonseca Afonso},
+    pdfsubject={Atividade 2 da disciplina TP546 -- Internet das Coisas e Redes Veiculares},
+    pdfkeywords={IoT, agricultura, irrigação de precisão, LoRaWAN, tomate, sensores}
+}
+
+\begin{document}
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+\centering
+\vspace*{1cm}
+{\large \textbf{INSTITUTO NACIONAL DE TELECOMUNICAÇÕES -- INATEL}}\\[0.4cm]
+{\large Curso de Mestrado}\\[0.4cm]
+{\large TP546 -- Internet das Coisas e Redes Veiculares}\\[1.6cm]
+{\large \textbf{ATIVIDADE 2 -- TRABALHO DE PESQUISA}}\\[1.4cm]
+{\LARGE \textbf{Internet das Coisas na agricultura: estudo de caso de irrigação de precisão com LoRaWAN}}\\[1.5cm]
+{\large Álvaro Lucio Almeida Ribeiro\\[0.2cm]Matheus Henrique Fonseca Afonso}\\[0.8cm]
+{\large Professor: Samuel Baraldi Mafra}
+\vfill
+\begin{minipage}{0.82\textwidth}
+\centering
+Este relatório analisa uma aplicação real de Internet das Coisas na agricultura, desenvolvida e testada em um cultivo de tomates na Penn State, com sensores, comunicação LoRaWAN e controle remoto de irrigação.
+\end{minipage}
+\vfill
+{\large Santa Rita do Sapucaí -- MG\\2026}
+\end{titlepage}
+
+\hypersetup{pageanchor=true}
+\pagenumbering{arabic}
+\twocolumn
+\section*{Resumo}
+\addcontentsline{toc}{section}{Resumo}
+Este trabalho analisa a aplicação de Internet das Coisas (IoT) à irrigação de precisão de tomates, documentada por Zhang et al. em 2022. O sistema foi implementado em campo na Penn State, Estados Unidos, durante a safra de 2020. A arquitetura integra sensores de potencial matricial do solo e pressão, registradores alimentados por energia solar, comunicação LoRaWAN, serviços de Internet e válvulas controladas remotamente. O experimento comparou quatro estratégias de manejo em blocos casualizados com quatro repetições. Os resultados demonstram a viabilidade do monitoramento e da atuação remota, mas também evidenciam perdas de dados, falhas de acionamento e influência do posicionamento dos sensores. A operação rotineira utilizou intervenção humana pela plataforma IoT. Conclui-se que o desempenho depende da integração entre medição representativa, decisão agronômica e execução confiável, e que os ganhos observados não podem ser atribuídos isoladamente à tecnologia de comunicação.
+
+\noindent\textbf{Palavras-chave:} Internet das Coisas; agricultura; irrigação de precisão; LoRaWAN; sensores de solo.
+
+\section{Introdução}
+Uma decisão de irrigação precisa responder a duas perguntas: quando fornecer água e em qual quantidade. Uma programação inadequada pode consumir água sem benefício proporcional para a produção ou deixar de atender à necessidade da cultura. A instrumentação do campo permite confrontar decisões de manejo com leituras do solo e com o funcionamento efetivo da irrigação.
+
+A IoT conecta esse processo físico a serviços de informação. Sensores produzem leituras, a rede as transporta, uma plataforma apresenta o histórico e os atuadores executam comandos. Entretanto, disponibilizar dados em uma tela não garante que a água tenha chegado às plantas. A análise de uma aplicação real deve considerar toda essa sequência, incluindo as falhas observadas.
+
+O caso selecionado é o sistema de irrigação de tomates descrito por Zhang et al. \cite{zhang2022}. Ele atende ao requisito da atividade porque foi construído e avaliado em campo, com instalação física, colheitas e comparação de tratamentos. O objetivo deste relatório é compreender o problema, identificar as tecnologias e avaliar resultados, benefícios e limitações dessa implementação.
+
+\section{Método de pesquisa e fontes}
+O trabalho é um estudo bibliográfico de caso único. A fonte principal é o artigo de Zhang et al., publicado em \textit{Smart Agricultural Technology}, volume 2, artigo 100053 \cite{zhang2022}. Seu DOI está indicado nas referências. Foram examinados o método experimental, a arquitetura, a tabela de resultados e a discussão das falhas.
+
+O relatório do projeto SARE LNE19-378 confirma a realização do estudo de tomates a céu aberto e documenta atividades de transferência de conhecimento aos produtores \cite{sare}. Essa fonte pertence ao mesmo projeto: corrobora sua existência, mas não constitui uma replicação independente. O artigo de Elia e Conversa é utilizado para explicar o sistema de apoio à decisão GesCoN \cite{elia2015}.
+
+As fontes foram consultadas em 7 de setembro de 2026. Os resultados numéricos são dos pesquisadores citados; não foram produzidos pelos autores desta atividade. As recomendações apresentadas ao final são uma análise crítica, sem atribuição de validação experimental às melhorias sugeridas.
+
+\section{Caracterização da aplicação real}
+O ensaio ocorreu na fazenda de pesquisa hortícola do Russell E. Larson Agricultural Research Center, da Penn State, em Furnace, Pensilvânia, durante a safra de 2020. Utilizou tomate da cultivar Red Deuce F1, cultivado em canteiros cobertos por filme plástico e irrigados por gotejamento. A área de plantio media aproximadamente $27{,}74 \times 42{,}67$~m \cite{zhang2022}.
+
+Foram comparados quatro tratamentos: evapotranspiração da cultura (ET), potencial matricial do solo com dois limiares (MP60 e MP40) e recomendações do GesCoN. O delineamento em blocos casualizados tinha quatro repetições, totalizando 16 parcelas experimentais. As colheitas utilizadas na avaliação ocorreram entre agosto e setembro de 2020 \cite{zhang2022}.
+
+O problema técnico era reunir medições distribuídas e comandar a irrigação sem inspecionar presencialmente cada leitura e cada válvula. O problema agronômico era selecionar um manejo que combinasse produção comercial e uso eficiente da água. Essas duas dimensões devem ser distinguidas: a rede disponibiliza informações e comandos, enquanto a estratégia de manejo determina como utilizá-los.
+
+\section{Tecnologias e arquitetura}
+\subsection{Sensoriamento e alimentação}
+O sistema empregou sensores Watermark 200SS-5 para medir o potencial matricial do solo. Essa grandeza expressa a condição de retenção da água no solo; na convenção de valores negativos utilizada no artigo, valores mais negativos indicam maior dificuldade para a planta extrair água. Ela não deve ser confundida com uma porcentagem de umidade volumétrica \cite{zhang2022}.
+
+Cada tratamento possuía quatro sensores, distribuídos em duas posições e nas profundidades de 20 e 40~cm. Nos tratamentos MP60 e MP40, a média das leituras a 20~cm orientava o início da irrigação. A medição a 40~cm auxiliava a observar a penetração da água. Sensores de pressão após as válvulas forneciam uma verificação física complementar, e medidores de volume acumulado registravam a água utilizada \cite{zhang2022}.
+
+Seis registradores de dados utilizavam placas Vinduino e módulos de comunicação GlobalSat LM513-H. Baterias LiPo de 3,7~V, com capacidades de 5.000 ou 10.000~mAh, eram recarregadas por pequenos painéis solares. Quatro válvulas solenoides biestáveis controlavam as linhas de irrigação dos tratamentos \cite{zhang2022}.
+
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+node distance=0.65cm and 1.2cm,
+box/.style={draw,rounded corners,align=center,minimum height=1.05cm,text width=3.5cm,fill=cinza,font=\small},
+sensor/.style={box,fill=blue!8,draw=azul},
+service/.style={box,fill=green!10,draw=verde},
+arrow/.style={-{Latex[length=2mm]},thick,draw=azul}
+]
+\node[sensor] (soil) {Sensores de solo\\e de pressão};
+\node[sensor,right=of soil] (logger) {Seis registradores\\Vinduino + rádio};
+\node[box,right=of logger] (gateway) {Gateway LoRaWAN\\Sentrius RG191};
+\node[service,below=1.05cm of gateway] (network) {Servidor de rede\\The Things Network};
+\node[service,left=of network] (platform) {AllThingsTalk\\histórico e comandos};
+\node[box,left=of platform] (valve) {Relés e quatro válvulas\\irrigação por gotejamento};
+\node[box,below=0.8cm of platform] (operator) {Operador\\avalia e comanda};
+\draw[arrow] (soil) -- (logger);
+\draw[arrow,<->] (logger) -- node[above,font=\tiny]{LoRaWAN} (gateway);
+\draw[arrow,<->] (gateway) -- node[right,font=\scriptsize]{Internet} (network);
+\draw[arrow,<->] (network) -- (platform);
+\draw[arrow,<->] (platform) -- (operator);
+\draw[arrow] (logger.south west) -- (valve.north east);
+\end{tikzpicture}
+\caption{Diagrama funcional elaborado pelos autores a partir da descrição em \cite{zhang2022}. As setas bidirecionais representam dados e comandos; o operador participa do controle.}
+\label{fig:arquitetura}
+\end{figure*}
+
+\subsection{Rede e plataforma de informação}
+Os registradores enviavam dados por LoRaWAN a um gateway Sentrius RG191 instalado em um escritório a aproximadamente 150~m do campo. A configuração experimental utilizava a faixa de 902--928~MHz. O gateway conectava os dispositivos ao serviço The Things Network/The Things Stack, integrado à plataforma AllThingsTalk \cite{zhang2022}.
+
+A plataforma armazenava e exibia medições, permitia exportar históricos e oferecia comandos para as válvulas. Os dados eram transmitidos em intervalos de um minuto, em mensagens binárias. A alimentação solar e o transporte de pequenas mensagens eram adequados ao monitoramento distribuído observado no ensaio \cite{zhang2022}. A distância de 150~m é a condição documentada, e não uma medida do alcance máximo da tecnologia.
+
+Na interpretação da arquitetura, a ligação LoRaWAN resolve a comunicação entre dispositivos de campo e gateway. O caminho até os serviços na Internet acrescenta outras dependências. Portanto, uma interrupção de dados pode resultar tanto do enlace local quanto do gateway ou das plataformas utilizadas; o registro de uma perda não identifica, sozinho, sua causa.
+
+\subsection{Fluxo operacional e intervenção humana}
+A sequência implementada era: medir o solo, transmitir a leitura, apresentá-la na plataforma, notificar o usuário quando o limiar fosse atingido e receber o comando remoto de irrigação. O operador acionava a válvula e verificava a pressão da linha; após o tempo definido, comandava o encerramento \cite{zhang2022}.
+
+Embora a automação integral tenha sido testada, ela não foi aplicada rotineiramente no ensaio. Os autores relatam perdas de sinal e atrasos potenciais na resposta das válvulas. Assim, o caso demonstra \textbf{monitoramento conectado e controle remoto com supervisão humana}, com limitações para operação inteiramente autônoma \cite{zhang2022}. A Figura~\ref{fig:arquitetura} representa essa participação do operador.
+
+\section{Estratégias de manejo avaliadas}
+O tratamento ET utilizava a evapotranspiração da cultura como base para a programação. MP60 e MP40 utilizavam os limiares de $-60$ e $-40$~kPa, respectivamente. Os sensores instalados nos tratamentos ET e GesCoN serviam ao monitoramento, sem transformar esses tratamentos em controle pelos mesmos limiares \cite{zhang2022}.
+
+O GesCoN é um sistema de apoio à decisão para fertirrigação. Seu método considera balanços de água e nitrogênio, crescimento da cultura, condições de solo e dados meteorológicos para recomendar o manejo \cite{elia2015}. No caso estudado, essas recomendações compunham uma estratégia distinta, executada por meio da infraestrutura de irrigação. Não se deve interpretar o resultado do GesCoN como se fosse produzido apenas pelo rádio LoRaWAN.
+
+O delineamento permite comparar as estratégias sob a infraestrutura utilizada. Ele não inclui um grupo equivalente cuja única diferença seja a presença ou ausência de LoRaWAN. Consequentemente, o estudo sustenta conclusões sobre a aplicação integrada e os tratamentos de manejo; não isola um efeito causal da conectividade sobre a produtividade.
+
+\begin{table*}[t]
+\centering
+\small
+\caption{Resultados do experimento, conforme a Tabela 2 de Zhang et al. \cite{zhang2022}.}
+\label{tab:resultados}
+\begin{tabularx}{\textwidth}{L{2cm}YYY}
+\toprule
+Tratamento & Água de irrigação (m$^3$/ha) & Produtividade comercial (Mg/ha) & iWUE (kg/m$^3$) \\
+\midrule
+ET & 2.440 & 54,21 bc & 22,22 b \\
+MP60 & 2.357 & 62,43 ab & 26,49 ab \\
+MP40 & 1.695 & 47,34 c & 27,94 a \\
+GesCoN & 2.339 & 66,19 a & 28,38 a \\
+\bottomrule
+\end{tabularx}
+\vspace{0.15cm}
+\begin{minipage}{\textwidth}
+\footnotesize
+Mg/ha equivale a toneladas por hectare. Na mesma coluna, médias que compartilham uma letra não diferem significativamente pelo teste LSD a 5\%. O artigo informa $p=0{,}01$ para produtividade e $p=0{,}05$ para iWUE; não apresenta teste equivalente para volume de água. As letras foram preservadas para evitar confundir diferenças numéricas com diferenças estatísticas.
+\end{minipage}
+\end{table*}
+
+\section{Resultados e interpretação}
+\subsection{Produção e utilização da água}
+A Tabela~\ref{tab:resultados} apresenta os valores publicados. A eficiência do uso da água de irrigação, iWUE, é definida como a massa de frutos comercializáveis dividida pelo volume de irrigação. Ela deve ser lida junto à produtividade, pois uma razão elevada pode coexistir com menor produção \cite{zhang2022}.
+
+
+
+Em relação ao ET, o GesCoN apresentou aproximadamente 22,1\% mais produtividade comercial e 4,1\% menos água de irrigação. São indicadores diferentes: o ganho de produtividade não representa a porcentagem de economia de água. A redução de volume pode ser conferida por $100(2440-2339)/2440 \approx 4{,}14\%$ \cite{zhang2022}.
+
+O MP60 utilizou aproximadamente 3,4\% menos água e apresentou produtividade numericamente 15,2\% maior que ET. Contudo, MP60 e ET compartilham a letra ``b'' na coluna de produtividade; essa comparação não demonstrou diferença estatisticamente significativa no teste empregado. Já GesCoN e ET não compartilham letras nessa coluna \cite{zhang2022}.
+
+O MP40 consumiu cerca de 30,5\% menos água que ET, mas sua produtividade foi numericamente 12,7\% menor quando calculada a partir da Tabela 2. O resumo do artigo informa 12,5\%; adota-se aqui o cálculo com os valores tabulados e registra-se a divergência. Além disso, a produtividade do MP40 não diferiu significativamente da do ET. Os autores relacionam seu desempenho à possível falta de representatividade da instalação dos sensores \cite{zhang2022}. Esse resultado não permite recomendar o limiar de $-40$~kPa como solução geral de economia de água.
+
+\subsection{Comunicação, energia e atuação}
+A taxa média de perda de dados dos seis registradores foi de 5,51\%. Houve interrupções superiores a dez minutos. A instalação interna do gateway e a desconexão de componentes do caminho de comunicação foram apontadas como possíveis causas. As baterias recarregadas por painéis solares sustentaram a operação no período monitorado, embora tenham ocorrido quedas de tensão e uma desconexão acidental de cabos de um painel \cite{zhang2022}.
+
+Também ocorreram situações em que a interface indicava abertura, mas a pressão não se alterava. O comando recebido não garantia a atuação física da válvula. Os autores consideraram obstrução do solenoide ou tensão insuficiente como possíveis explicações e sugeriram alimentação de maior tensão para melhorar o acionamento \cite{zhang2022}. A evidência mais relevante é a necessidade de confirmar o efeito físico, além de registrar o envio do comando.
+
+\section{Benefícios e limitações}
+\subsection{Benefícios observados}
+O sistema integrou o histórico do solo ao controle remoto de válvulas. Isso possibilitou acompanhar a irrigação e confrontar comandos com pressão medida. Os resultados também mostram que uma estratégia de manejo pode combinar maior produção comercial e menor volume aplicado, como observado na comparação entre GesCoN e ET \cite{zhang2022}.
+
+O projeto SARE associado relata atividades de extensão e instalação de conjuntos de sensores por nove produtores em 16 campos \cite{sare}. Esse dado demonstra transferência prática no projeto mais amplo, mas não significa que todos esses locais reproduziram o sistema de tomates ou os mesmos resultados.
+
+\subsection{Limites da evidência}
+O ensaio de tomates representa um local, uma cultivar e uma safra. A escolha de sensores e limiares precisa considerar o solo, a instalação e as condições de cultivo. A discussão do MP40 mostra que transmitir uma leitura com sucesso não assegura sua representatividade agronômica \cite{zhang2022}.
+
+A taxa agregada de perda de dados também não mede a probabilidade de uma válvula fechar no instante necessário. Uma avaliação de autonomia deveria registrar separadamente atrasos de comandos, falhas de abertura e fechamento, duração das interrupções e confirmação hidráulica. São requisitos de avaliação derivados da análise do caso, não métricas já demonstradas pelo experimento.
+
+Não há, no artigo principal, uma análise econômica completa que permita calcular retorno do investimento, custo por hectare ou economia comprovada de mão de obra. A manutenção de sensores, baterias, válvulas e serviços deve integrar qualquer avaliação de adoção. Da mesma forma, o trabalho não apresenta uma auditoria de cibersegurança que permita classificar a solução como integralmente segura.
+
+\section{Lições para uma implantação semelhante}
+Como recomendações desta análise, uma implantação deveria começar pela verificação da representatividade das medições e da execução dos comandos. Um piloto em condições locais permitiria ajustar os limiares com apoio agronômico e observar a resposta do solo à irrigação antes de ampliar o sistema.
+
+Para a comunicação, convém avaliar a posição do gateway e registrar as falhas por componente. Para a atuação, uma confirmação por pressão ou vazão ajuda a distinguir o estado apresentado na interface da água efetivamente fornecida. A autonomia exigiria ainda um comportamento local de contingência, definido conforme o risco da cultura, e limites de duração da irrigação validados em campo.
+
+O acesso aos comandos deve ser restrito a usuários autorizados, com proteção das credenciais e histórico de alterações. Essas medidas são recomendações de projeto, sem pressupor que tenham sido auditadas no sistema publicado. Uma eventual avaliação brasileira precisaria considerar condições locais de cobertura, suporte, disponibilidade dos componentes e custo de manutenção, sem importar automaticamente os ganhos percentuais do ensaio.
+
+\section{Conclusão}
+O estudo de Zhang et al. fornece evidências de uma aplicação real de IoT na agricultura: sensores, comunicação LoRaWAN, serviços de Internet e válvulas foram integrados e utilizados em um experimento de irrigação de tomates. A comparação dos tratamentos mostrou resultados favoráveis ao GesCoN frente ao ET para produtividade e eficiência do uso da água, dentro das condições avaliadas.
+
+O caso também mostra que monitoramento conectado não basta para assegurar autonomia. Perdas de comunicação, falhas de atuação e posicionamento dos sensores influenciaram a operação, que manteve supervisão humana. A principal contribuição da IoT foi viabilizar o fluxo de informações e comandos; o benefício agrícola dependeu conjuntamente da qualidade da medição, da estratégia de manejo e da execução física da irrigação.
+
+\begin{spacing}{1}
+\footnotesize
+\bibliographystyle{IEEEtran}
+\bibliography{referencias}
+\end{spacing}
+\end{document}
