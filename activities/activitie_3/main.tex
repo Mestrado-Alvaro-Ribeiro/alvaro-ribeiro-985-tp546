@@ -13,7 +13,7 @@
 \usepackage{tabularx}
 \usepackage{enumitem}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,backgrounds}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,backgrounds,calc}
 \usepackage{xurl}
 \usepackage[hidelinks]{hyperref}
 
@@ -33,7 +33,7 @@
 \date{2026}
 \hypersetup{
     pdftitle={Credenciais padrão em dispositivos IoT: comprometimento por botnet e ataques distribuídos de negação de serviço},
-    pdfauthor={Álvaro Lucio Almeida Ribeiro; Matheus Henrique Fonseca Afonso},
+    pdfauthor={Álvaro Lucio Almeida Ribeiro e Matheus Henrique Fonseca Afonso},
     pdfsubject={Atividade 3 da disciplina TP546 -- Internet das Coisas e Redes Veiculares},
     pdfkeywords={IoT, segurança, credenciais padrão, botnet, Mirai, DDoS}
 }
@@ -67,7 +67,7 @@ Este relatório analisa como credenciais universais, fracas ou mantidas no estad
 \addcontentsline{toc}{section}{Resumo}
 A Internet das Coisas conecta câmeras, roteadores, gravadores de vídeo, sensores e atuadores que frequentemente operam com pouca supervisão. Este relatório investiga um problema específico: o uso de credenciais universais, previsíveis ou mantidas no estado de fábrica em serviços de administração acessíveis pela rede. O ataque selecionado é o comprometimento automatizado inspirado na botnet Mirai. Nesse encadeamento, o atacante identifica dispositivos com serviço remoto exposto, testa um conjunto reduzido de credenciais conhecidas, instala um agente e passa a controlar os equipamentos para produzir tráfego de negação de serviço distribuída (DDoS). A literatura registra que o Mirai atingiu um pico de aproximadamente 600 mil infecções e afetou serviços relevantes em 2016. Uma demonstração conceitual em laboratório isolado mostra as etapas e os indicadores observáveis sem propagar código malicioso nem gerar tráfego contra terceiros. A análise indica que trocar a senha após a instalação é necessária, porém insuficiente. A mitigação exige credenciais iniciais únicas ou definidas no primeiro uso, desativação de interfaces desnecessárias, restrição de exposição à Internet, atualização autenticada, segmentação de rede, monitoramento e resposta a incidentes. O problema deve ser tratado conjuntamente por fabricantes, integradores e operadores ao longo do ciclo de vida do produto.
 
-\noindent\textbf{Palavras-chave:} Internet das Coisas; segurança; credenciais padrão; botnet; Mirai; DDoS.
+\noindent\textbf{Palavras-chave:} Internet das Coisas, segurança, credenciais padrão, botnet, Mirai e DDoS.
 
 \section{Introdução}
 Dispositivos de Internet das Coisas (IoT) combinam sensores, processamento, comunicação e, em alguns casos, atuação física. Essa integração amplia a superfície de ataque: uma câmera ou um roteador comprometido não é apenas um equipamento defeituoso, mas um computador conectado que pode observar a rede, consumir recursos e enviar tráfego a terceiros. Como muitos produtos são instalados em grande escala e administrados raramente, uma falha repetida em todos os exemplares pode ser explorada de forma automatizada.
@@ -81,9 +81,9 @@ O objetivo é explicar o problema, apresentar o encadeamento de um ataque espec�
 \section{Método de pesquisa e escopo}
 O trabalho utiliza pesquisa bibliográfica e análise de caso. A principal fonte empírica é o estudo longitudinal de Antonakakis et al., apresentado no USENIX Security Symposium de 2017. Os autores combinaram diferentes pontos de observação para reconstruir o crescimento, a composição e os ataques do Mirai entre agosto de 2016 e fevereiro de 2017~\cite{antonakakis2017}. O artigo de Kolias et al. complementa a caracterização das botnets IoT e de seu uso em DDoS~\cite{kolias2017}.
 
-As medidas de mitigação são relacionadas a três referências. O NISTIR 8259A define uma linha de base de capacidades de segurança para dispositivos IoT, incluindo identificação, configuração, proteção de dados, controle de acesso às interfaces, atualização de software e consciência do estado de segurança~\cite{nist8259a}. A norma ETSI EN 303 645 estabelece requisitos básicos para produtos IoT de consumo e determina que senhas, quando utilizadas fora do estado inicial, sejam únicas por dispositivo ou definidas pelo usuário~\cite{etsi303645}. As recomendações da CISA enfatizam a eliminação de senhas padrão e a adoção de padrões seguros desde a fabricação~\cite{cisa2023passwords}.
+As medidas de mitigação são relacionadas a referências técnicas e regulatórias. O NISTIR 8259A define uma linha de base de capacidades de segurança para dispositivos IoT, incluindo identificação, configuração, proteção de dados, controle de acesso às interfaces, atualização de software e consciência do estado de segurança~\cite{nist8259a}. A revisão do NISTIR 8259, publicada em 2026, complementa essa linha de base ao organizar atividades do fabricante desde a identificação de necessidades de segurança até o suporte e o fim de vida do produto~\cite{nist8259r1}. A norma ETSI EN 303 645 estabelece requisitos básicos para produtos IoT de consumo e determina que senhas, quando utilizadas fora do estado inicial, sejam únicas por dispositivo ou definidas pelo usuário~\cite{etsi303645}. As recomendações da CISA enfatizam a eliminação de senhas padrão e a adoção de padrões seguros desde a fabricação~\cite{cisa2023passwords}. Como evidência da passagem de recomendação para requisito de mercado, considera-se ainda o regime britânico de segurança de produtos conectáveis~\cite{ukpsti2023}.
 
-O escopo técnico limita-se ao comprometimento por credenciais e ao uso do equipamento como bot de DDoS. Vulnerabilidades de memória, ataques à cadeia de suprimentos, extração física de chaves, privacidade e segurança de protocolos sem fio são problemas relevantes, mas não constituem o foco. A demonstração é conceitual e controlada; ela não mede a capacidade de uma botnet real nem valida a segurança de um produto comercial.
+O escopo técnico limita-se ao comprometimento por credenciais e ao uso do equipamento como bot de DDoS. Vulnerabilidades de memória, ataques à cadeia de suprimentos, extração física de chaves, privacidade e segurança de protocolos sem fio são problemas relevantes, mas não constituem o foco. Como a demonstração é conceitual e controlada, ela não mede a capacidade de uma botnet real nem valida a segurança de um produto comercial.
 
 \section{Problema selecionado: credenciais inseguras}
 \subsection{Origem da vulnerabilidade}
@@ -92,6 +92,8 @@ Uma credencial padrão é uma combinação de identidade e segredo definida pelo
 O erro não pertence exclusivamente ao usuário. Se o produto funciona normalmente sem exigir a troca da senha, a configuração insegura tende a persistir. Em implantações grandes, alterar centenas de credenciais manualmente também pode levar à reutilização ou a registros desprotegidos. A abordagem de segurança por padrão transfere parte da solução para o projeto: cada unidade deve sair com segredo inicial único, ou exigir que o proprietário defina um segredo antes de habilitar a operação normal~\cite{cisa2023passwords,etsi303645}.
 
 Três condições transformam a fragilidade em comprometimento remoto: uma interface de administração ativa, alcance de rede até essa interface e autenticação previsível. A falha é especialmente grave quando o serviço concede privilégios administrativos e o dispositivo executa um sistema operacional capaz de baixar ou iniciar programas. Mesmo que o equipamento armazene poucos dados sensíveis, seus recursos de rede podem ser apropriados para ataques contra terceiros.
+
+Essa distinção evita tratar a senha como causa isolada. A credencial conhecida fornece a oportunidade de autenticação, enquanto a exposição permite que o atacante alcance o serviço. O privilégio e a capacidade de execução, por sua vez, convertem o acesso em controle. Na escala de uma botnet, a homogeneidade de milhares de unidades transforma essa conjunção em risco sistêmico. Consequentemente, cada controle pode reduzir o risco de forma independente: retirar a exposição evita a descoberta remota, individualizar a credencial impede a reutilização em massa e restringir execução e saída limita o dano mesmo após uma conta comprometida.
 
 \subsection{Impactos}
 A confidencialidade pode ser afetada pelo acesso a imagens, áudio, configuração ou topologia. A integridade pode ser violada por mudanças no DNS, nas regras de encaminhamento ou no comportamento de sensores e atuadores. A disponibilidade pode ser reduzida tanto localmente, pelo consumo de processador e banda, quanto externamente, quando milhares de dispositivos enviam tráfego coordenado a uma vítima.
@@ -157,7 +159,7 @@ arrow/.style={-{Latex[length=2mm]},thick,draw=vermelho}
 \label{fig:ataque}
 \end{figure*}
 
-Cada etapa produz evidências. Varreduras criam muitas conexões curtas; tentativas de acesso aparecem nos registros de autenticação; a instalação pode alterar processos, memória ou arquivos temporários; o comando e controle cria conexões de saída incomuns; e o DDoS aumenta abruptamente o volume e a taxa de pacotes. A ausência de um único indicador não comprova segurança, pois dispositivos simples podem não registrar eventos e variantes podem modificar protocolos.
+Cada etapa produz evidências. As varreduras criam muitas conexões curtas, enquanto as tentativas de acesso aparecem nos registros de autenticação. A instalação pode alterar processos, memória ou arquivos temporários. Em seguida, o comando e controle cria conexões de saída incomuns, e o DDoS aumenta abruptamente o volume e a taxa de pacotes. A ausência de um único indicador não comprova segurança, pois dispositivos simples podem não registrar eventos e variantes podem modificar protocolos.
 
 \subsection{Por que o ataque funciona}
 O ataque é econômico porque explora homogeneidade. Uma lista curta de credenciais pode valer para milhares de unidades, e a tentativa pode ser automatizada. Equipamentos permanecem ligados continuamente, possuem acesso à Internet e nem sempre executam proteção de endpoint. Além disso, o proprietário pode não perceber a infecção enquanto a função principal, como exibir vídeo ou encaminhar pacotes, continua disponível.
@@ -169,6 +171,35 @@ A autenticação fraca é a porta de entrada, mas o dano depende de outras fragi
 A demonstração proposta utiliza uma rede virtual sem roteamento para a Internet, formada por quatro elementos: uma estação de teste autorizada, um dispositivo IoT simulado, um controlador simulado e um servidor que representa a vítima. O dispositivo contém deliberadamente uma conta de laboratório e um serviço de administração. O firewall da máquina hospedeira bloqueia entrada e saída da rede virtual, impedindo varredura, propagação ou tráfego para endereços externos.
 
 Não é necessário executar o código do Mirai. Um programa benigno pode representar o agente ao enviar uma mensagem periódica ao controlador. O suposto DDoS é substituído por uma quantidade pequena e previamente limitada de requisições ao servidor local. A finalidade é observar transições de estado e registros, não medir saturação. Todos os endereços pertencem ao laboratório e o operador mantém autorização sobre cada componente.
+
+\begin{figure*}[t]
+\centering
+\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}[
+host/.style={draw,rounded corners,align=center,minimum height=1.05cm,text width=2.65cm,fill=blue!7,draw=azul,font=\small},
+service/.style={host,fill=green!9,draw=verde},
+blocked/.style={host,fill=red!7,draw=vermelho},
+flow/.style={-{Latex[length=2mm]},thick,draw=azul},
+bidir/.style={{Latex[length=2mm]}-{Latex[length=2mm]},thick,draw=verde},
+deny/.style={thick,dashed,draw=vermelho},
+edge label/.style={font=\scriptsize,align=center,fill=white,inner sep=1.5pt}
+]
+\node[host] (test) {Estação de teste};
+\node[service,right=1.9cm of test] (iot) {Dispositivo IoT\\simulado};
+\node[service,right=1.9cm of iot] (controller) {Controlador local\\comandos limitados};
+\node[host,below=1.35cm of iot] (server) {Servidor-vítima local\\requisições limitadas};
+\node[blocked,right=1.7cm of controller] (internet) {Internet e\\terceiros};
+\draw[flow] (test) -- node[edge label,above=1mm]{acesso\\autorizado} (iot);
+\draw[bidir] (iot) -- node[edge label,above=1mm]{sinal e\\comando} (controller);
+\draw[flow] (iot) -- node[edge label,right=1mm]{taxa\\limitada} (server);
+\draw[deny] (controller) -- node[edge label,above=1mm,text=vermelho]{sem rota} (internet);
+\node[text=vermelho,font=\bfseries\Large] at ($(controller)!0.5!(internet)$) {$\times$};
+\node[draw=verde,dashed,rounded corners,fit=(test)(iot)(controller)(server),inner sep=0.45cm,label={[font=\small,text=verde]above:Rede virtual isolada}] {};
+\end{tikzpicture}
+}
+\caption{Topologia segura da demonstração. Todos os fluxos permanecem no laboratório, e a ausência de rota impede acesso à Internet e a terceiros.}
+\label{fig:topologia}
+\end{figure*}
 
 \subsection{Procedimento}
 O primeiro passo é registrar o estado inicial: serviço disponível, conta configurada, conexões existentes e consumo normal. A estação de teste então verifica somente o endereço do dispositivo simulado e constata a interface administrativa exposta. Uma tentativa com a credencial de laboratório demonstra que o segredo conhecido concede acesso. Não se realiza varredura de faixas públicas nem teste contra equipamento de terceiros.
@@ -197,7 +228,7 @@ Mitigação & Trocar credencial, fechar serviço e bloquear saída & Falha de ac
 \end{table*}
 
 \subsection{Interpretação e limitações}
-O ensaio demonstra causalidade no cenário restrito: quando a credencial conhecida e a interface exposta coexistem, ocorre acesso; quando esses fatores são removidos, o mesmo caminho falha. Ele também permite verificar indicadores de rede e registros. Contudo, não autoriza extrapolar volume, alcance ou eficácia para a Internet. Um único dispositivo simulado não representa a diversidade de arquiteturas, firmwares e mecanismos de persistência observada em botnets reais.
+O ensaio demonstra causalidade no cenário restrito. Quando a credencial conhecida e a interface exposta coexistem, ocorre acesso. Quando esses fatores são removidos, o mesmo caminho falha. O ensaio também permite verificar indicadores de rede e registros, mas não autoriza extrapolar volume, alcance ou eficácia para a Internet. Um único dispositivo simulado não representa a diversidade de arquiteturas, firmwares e mecanismos de persistência observada em botnets reais.
 
 Não se deve chamar o tráfego limitado de DDoS real, porque não há distribuição ampla nem indisponibilidade. Trata-se de uma simulação do fluxo de controle. A escala histórica e os impactos do Mirai provêm da literatura citada, não do ensaio proposto.
 
@@ -205,9 +236,14 @@ Não se deve chamar o tráfego limitado de DDoS real, porque não há distribui�
 \subsection{Projeto e fabricação}
 A medida mais direta é eliminar senhas universais. A ETSI requer senhas únicas por dispositivo ou definidas pelo usuário depois do estado de fábrica e recomenda que valores pré-instalados sejam gerados de modo resistente a ataques automatizados~\cite{etsi303645}. A CISA recomenda senha inicial individual ou definição obrigatória durante a configuração, de forma que o produto não dependa de o usuário descobrir posteriormente uma opção de segurança~\cite{cisa2023passwords}.
 
-O produto também deve reduzir interfaces e privilégios. Serviços de manutenção desnecessários precisam ser desativados; os necessários devem aceitar somente protocolos protegidos e entidades autorizadas. Segredos não devem ser recuperáveis por mecanismos triviais, e tentativas repetidas devem sofrer limitação de taxa. Para autenticação entre máquinas, chaves ou certificados individuais são preferíveis a senhas humanas compartilhadas.
+O produto também deve reduzir interfaces e privilégios. Serviços de manutenção desnecessários precisam ser desativados, enquanto os necessários devem aceitar somente protocolos protegidos e entidades autorizadas. Segredos não devem ser recuperáveis por mecanismos triviais, e tentativas repetidas devem sofrer limitação de taxa. Para autenticação entre máquinas, chaves ou certificados individuais são preferíveis a senhas humanas compartilhadas.
 
 Atualizações precisam ser autenticadas, íntegras e disponibilizadas durante um período declarado de suporte. O NIST inclui atualização segura, restrição de acesso lógico às interfaces e capacidade de informar o estado de segurança entre os elementos da linha de base~\cite{nist8259a}. Inicialização verificada e proteção da integridade dificultam a execução de agentes não autorizados, ainda que uma conta seja comprometida.
+
+\subsection{Requisitos verificáveis e regulação}
+As boas práticas passaram a influenciar obrigações de mercado. No Reino Unido, o regime de segurança para produtos conectáveis entrou em vigor em 29 de abril de 2024. Entre os requisitos aplicáveis a produtos de consumo estão o uso de senha única por produto ou definida pelo usuário, a publicação de um canal para relato de vulnerabilidades e a divulgação do período mínimo de atualizações de segurança~\cite{ukpsti2023}. A senha individual não pode ser derivada de contador incremental, informação pública ou identificador do produto de modo facilmente previsível.
+
+Esse exemplo é relevante mesmo fora daquela jurisdição porque converte expressões vagas, como ``senha forte'' e ``produto atualizável'', em evidências auditáveis. Na aquisição, o comprador pode exigir amostras de duas unidades para verificar segredos distintos, data explícita de fim de suporte, procedimento de relato de falhas e demonstração de rejeição de firmware não autenticado. A revisão do NISTIR 8259 reforça essa visão de ciclo de vida ao atribuir ao fabricante atividades anteriores à venda e apoio contínuo ao uso seguro do produto~\cite{nist8259r1}.
 
 \subsection{Implantação e operação}
 O integrador deve manter inventário de dispositivos, modelos, versões, responsáveis e datas de fim de suporte. Antes de conectar um equipamento, deve alterar credenciais, desativar contas e serviços não utilizados, aplicar atualizações e verificar se a interface administrativa está exposta. Administração remota, quando necessária, pode ser restrita a uma rede de gestão ou a uma VPN, em vez de publicada diretamente na Internet.
@@ -230,7 +266,7 @@ Se o produto não recebe correções, não permite trocar credenciais ou depende
 \toprule
 Responsável & Medida & Etapa interrompida & Verificação \\
 \midrule
-Fabricante & Credencial única ou criação obrigatória no primeiro uso & Autenticação automatizada & Duas unidades não compartilham segredo; produto não opera com senha universal \\
+Fabricante & Credencial única ou criação obrigatória no primeiro uso & Autenticação automatizada & Duas unidades não compartilham segredo e o produto não opera com senha universal \\
 Fabricante & Desativar serviços desnecessários e fornecer atualização autenticada & Descoberta e instalação do agente & Teste de portas e validação criptográfica da atualização \\
 Integrador & Remover exposição direta e usar rede de administração & Descoberta remota & Interface inacessível a partir de redes não autorizadas \\
 Operador & Inventariar, atualizar e substituir itens sem suporte & Exploração e permanência & Versão e prazo de suporte registrados por ativo \\
@@ -251,7 +287,7 @@ Não existe uma única medida que elimine todas as variantes de botnet. Credenci
 Para aquisição, a organização pode transformar essas medidas em requisitos verificáveis: ausência de senha universal, prazo de suporte declarado, atualização autenticada, documentação de serviços, registro de eventos e mecanismo de restauração. Esse procedimento é mais objetivo do que aceitar declarações genéricas de que um produto é ``seguro''.
 
 \section{Conclusão}
-Credenciais padrão ou previsíveis constituem um problema crítico em redes IoT porque uma falha replicada em muitos equipamentos permite comprometimento automatizado. O Mirai demonstrou esse encadeamento ao localizar interfaces Telnet, testar uma lista reduzida de credenciais, incorporar dispositivos a uma botnet e coordená-los em ataques DDoS. A estimativa de pico de aproximadamente 600 mil infecções pertence à análise histórica de Antonakakis et al.; a demonstração proposta neste relatório apenas reproduz, de forma benigna e isolada, a sequência lógica do ataque~\cite{antonakakis2017}.
+Credenciais padrão ou previsíveis constituem um problema crítico em redes IoT porque uma falha replicada em muitos equipamentos permite comprometimento automatizado. O Mirai demonstrou esse encadeamento ao localizar interfaces Telnet, testar uma lista reduzida de credenciais, incorporar dispositivos a uma botnet e coordená-los em ataques DDoS. A estimativa de pico de aproximadamente 600 mil infecções pertence à análise histórica de Antonakakis et al. A demonstração proposta neste relatório apenas reproduz, de forma benigna e isolada, a sequência lógica do ataque~\cite{antonakakis2017}.
 
 Sanar o problema exige eliminar credenciais universais, obrigar configuração segura, restringir interfaces, fornecer atualizações autenticadas e impedir execução não autorizada. Na implantação, inventário, segmentação, controle de exposição e filtragem de saída reduzem alcance e impacto. Monitoramento e resposta completam o ciclo, pois permitem identificar comportamento anormal, isolar o equipamento e corrigir a causa antes da reconexão.
 
