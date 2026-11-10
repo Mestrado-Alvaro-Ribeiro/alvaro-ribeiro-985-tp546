@@ -5,7 +5,8 @@ enunciado. Não há servidor web, conta Blynk ou token externo necessário.
 
 ## Conectar
 
-1. Inicie o projeto com `docker compose up --build -d`.
+1. Inicie o projeto publicando as portas opcionais do broker com
+   `docker compose -f docker-compose.yml -f compose.host-ports.yaml up --build -d`.
 2. Instale e abra o [MQTTX Desktop](https://mqttx.app/).
 3. Crie uma conexão chamada `Smart Environment`, com protocolo MQTT 3.1.1,
    host `localhost`, porta `1883` e client ID `mqttx-demo`.

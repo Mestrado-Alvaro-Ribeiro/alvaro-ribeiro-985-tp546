@@ -2,8 +2,8 @@
 
 Simulação de uma sala monitorada por Internet das Coisas para a disciplina TP546.
 Cinco sensores Python publicam temperatura, umidade, CO₂, luminosidade e presença
-em um broker Mosquitto. O MQTTX permite acompanhar os dados, os alertas e o estado
-do dispositivo, além de mudar o cenário durante a demonstração.
+em um broker Mosquitto. Um painel React permite acompanhar os dados, os alertas e
+o estado do dispositivo, além de mudar o cenário durante a demonstração.
 
 > [!NOTE]
 > As leituras são sintéticas. O projeto demonstra comunicação e processamento IoT.
@@ -21,7 +21,28 @@ cp .env.example .env
 docker compose up --build -d
 ```
 
-Abra o [MQTTX Desktop](https://mqttx.app/), crie uma conexão MQTT 3.1.1 com host
+Abra **http://localhost:3000** para visualizar o painel. Os dados são atualizados
+automaticamente, com cartões dos cinco sensores, gráfico das últimas 60 leituras,
+alertas e seleção dos seis cenários. A presença aparece no resumo da sala.
+O painel distingue dados antigos, dispositivo offline e falha de conexão;
+mudanças de cenário são confirmadas pela próxima telemetria do simulador.
+O histórico fica apenas na memória da aba e reinicia ao recarregar a página.
+
+Por padrão, somente a porta 3000 é publicada no computador. O broker usa as
+portas 1883 e 9001 apenas dentro do Docker, evitando conflitos com um Mosquitto
+ou outro serviço já instalado. Não é necessário apagar imagens ou volumes.
+
+Para acessar o broker a partir do computador (MQTTX, Python local ou Vite),
+habilite explicitamente as portas:
+
+```bash
+docker compose -f docker-compose.yml -f compose.host-ports.yaml up --build -d
+```
+
+Se houver conflito nesse modo opcional, ajuste `MQTT_PORT` e `MQTT_WS_PORT` no
+`.env` para portas livres. Esses valores não afetam a comunicação interna.
+
+Opcionalmente, abra o [MQTTX Desktop](https://mqttx.app/), crie uma conexão MQTT 3.1.1 com host
 `localhost`, porta `1883`, sem TLS e sem autenticação, e assine
 `iot/environment/room01/#` com QoS 1. Use um client ID diferente de
 `simulator-room01`. Os dados são enviados a cada cinco segundos.
@@ -31,9 +52,37 @@ docker compose ps
 docker compose logs --tail=20 sensor-simulator
 ```
 
-O guia [dashboard/mqttx.md](dashboard/mqttx.md) descreve a demonstração completa.
-MQTTX é a interface entregue nesta versão. Blynk e painel web não são necessários
-para executar o projeto.
+O guia [dashboard/mqttx.md](dashboard/mqttx.md) descreve a demonstração pelo MQTTX,
+que continua disponível como ferramenta auxiliar.
+
+### Desenvolvimento do frontend
+
+Com Node.js 22.12+ e npm instalados, deixe broker e simulador rodando no Docker
+e pare o frontend Docker para liberar a porta 3000:
+
+```bash
+docker compose -f docker-compose.yml -f compose.host-ports.yaml up --build -d mosquitto sensor-simulator
+docker compose stop frontend
+cd frontend
+npm ci
+npm run dev
+```
+
+Abra http://localhost:3000. O Vite encaminha `/mqtt` ao WebSocket do broker em
+`127.0.0.1:9001`; o Nginx faz o mesmo na execução Docker, usando a rede interna.
+O frontend lê `DEVICE_ID`, `TOPIC_PREFIX`, `PUBLISH_INTERVAL` e `MQTT_WS_PORT` do
+arquivo `project_iot/.env` no desenvolvimento. No Docker, os três primeiros são
+argumentos de build, então execute `docker compose up --build -d` após alterá-los.
+`FRONTEND_PORT` muda a porta do painel Docker, e `MQTT_WS_PORT` muda a porta local
+do broker WebSocket no modo opcional com `compose.host-ports.yaml`. Ambas são
+publicadas somente em `127.0.0.1`.
+
+Verificações do frontend, dentro de `frontend/`:
+
+```bash
+npm test
+npm run build
+```
 
 ## Arquitetura
 
@@ -42,13 +91,15 @@ flowchart LR
     S[Cinco sensores simulados] --> P[Python e Paho]
     P -->|MQTT QoS 1| B[Mosquitto]
     B --> X[MQTTX]
+    B <-->|MQTT sobre WebSocket via Nginx| R[Painel React]
     X -->|Comando de cenário| B
     B --> P
     H[ESP32 futuro] -. Mesmo contrato JSON .-> B
 ```
 
 O simulador e o broker ficam na rede Docker `iot-network`. Dentro dela, o broker
-é `mosquitto:1883`. A porta publicada no computador é `127.0.0.1:1883`.
+é `mosquitto:1883`. O acesso ao broker pelo computador é opcional, habilitado
+por `compose.host-ports.yaml`.
 O Compose aguarda o healthcheck do broker antes de iniciar o simulador.
 
 ```text
@@ -58,6 +109,7 @@ project_iot/
 ├── src/physical/esp32/     # Especificação de integração física
 ├── mqtt/config/           # Configuração do Mosquitto
 ├── dashboard/             # Guia de visualização no MQTTX
+├── frontend/              # Painel React, testes e Nginx
 ├── tests/                 # Testes unitários e integração MQTT real
 ├── docs/                  # Arquitetura, hardware, mercado e demonstração
 ├── presentation/          # PowerPoint e fonte para regeneração
@@ -84,7 +136,7 @@ simuladores com o mesmo ID:
 ```bash
 uv sync --locked
 docker compose stop sensor-simulator
-docker compose up -d mosquitto
+docker compose -f docker-compose.yml -f compose.host-ports.yaml up -d mosquitto
 uv run --locked --env-file .env iot-simulator
 ```
 
@@ -182,7 +234,7 @@ make lint
 Os testes de integração exigem um broker real acessível em `MQTT_HOST:MQTT_PORT`:
 
 ```bash
-docker compose up -d mosquitto
+docker compose -f docker-compose.yml -f compose.host-ports.yaml up -d mosquitto
 make integration
 ```
 

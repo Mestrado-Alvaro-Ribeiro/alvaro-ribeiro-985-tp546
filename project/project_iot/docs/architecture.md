@@ -20,6 +20,7 @@ flowchart TB
     end
     subgraph Aplicacao[Aplicação]
         X[Visualização no MQTTX]
+        R[Painel React via WebSocket e Nginx]
         A[Regras de alerta]
     end
     subgraph Negocio[Uso da informação]
@@ -27,6 +28,8 @@ flowchart TB
         F[Integrações futuras: HVAC e automação]
     end
     S --> P --> M --> X --> D
+    M --> R --> D
+    R -->|Comando de cenário| M
     E -.-> W -.-> M
     S --> A --> P
     D -.-> F
@@ -35,6 +38,14 @@ flowchart TB
 No simulador, os alertas são calculados antes da publicação. Um futuro dispositivo
 físico pode executar regras equivalentes ou delegá-las a um subscriber central.
 Não existe atuação automática na versão atual.
+
+O painel React é servido em `http://localhost:3000` pelo Compose. O Nginx encaminha
+`/mqtt` ao listener WebSocket do Mosquitto, na porta interna 9001. O Compose padrão
+publica somente a porta do frontend. No desenvolvimento, `compose.host-ports.yaml`
+publica as portas MQTT no computador e o Vite usa o WebSocket no loopback. Não há API intermediária
+nem persistência adicional: o gráfico mantém até 60 leituras recebidas nesta aba.
+Alertas são correlacionados com a telemetria pelo timestamp, e comandos de cenário
+usam QoS 1 sem retenção; a próxima telemetria confirma a mudança.
 
 ## Modelo de simulação
 
