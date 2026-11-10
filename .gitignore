@@ -14,3 +14,4 @@
 /project/project_iot/**/.ruff_cache/
 /project/project_iot/**/*.egg-info/
 /project/project_iot/**/dist/
+/project/project_iot/**/node_modules/
