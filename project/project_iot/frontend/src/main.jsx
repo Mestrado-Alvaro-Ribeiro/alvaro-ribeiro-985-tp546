@@ -96,8 +96,16 @@ function Chart({ history, metric }) {
       >
         <defs>
           <linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#5b9d73" stopOpacity=".22" />
-            <stop offset="100%" stopColor="#5b9d73" stopOpacity="0" />
+            <stop
+              offset="0%"
+              stopColor="var(--sensor-color)"
+              stopOpacity=".3"
+            />
+            <stop
+              offset="100%"
+              stopColor="var(--sensor-color)"
+              stopOpacity="0"
+            />
           </linearGradient>
         </defs>
         {[0, 1, 2, 3].map((i) => (
@@ -119,7 +127,7 @@ function Chart({ history, metric }) {
         <polyline
           points={points}
           fill="none"
-          stroke="#428660"
+          stroke="var(--sensor-color)"
           strokeWidth="3"
           strokeLinejoin="round"
           strokeLinecap="round"
@@ -283,43 +291,7 @@ function App() {
           : "Sem dados recentes";
   return (
     <div className="app-shell">
-      <aside className="sidebar">
-        <a
-          className="brand"
-          href="#overview"
-          aria-label="Smart Environment — início"
-        >
-          <span className="brand-icon">▥</span>
-          <span>
-            smart<span className="brand-light">environment</span>
-            <small>MONITORAMENTO AMBIENTAL</small>
-          </span>
-        </a>
-        <div className="sidebar-label">WORKSPACE</div>
-        <a className="nav-item selected" href="#overview">
-          <span>▦</span> Visão geral <span className="nav-arrow">↗</span>
-        </a>
-        <a className="nav-item" href="#history">
-          <span>⌁</span> Histórico da sessão
-        </a>
-        <a className="nav-item" href="#scenarios">
-          <span>☷</span> Cenários
-        </a>
-        <div className="sidebar-bottom">
-          <div className="project-mark">TP</div>
-          <div>
-            Projeto IoT<small>TP546 · Ambiente simulado</small>
-          </div>
-          <span className="tiny-dot" />
-        </div>
-      </aside>
       <main id="overview">
-        <header className="topbar">
-          <div className="breadcrumb">
-            Workspace <span>/</span> <b>Visão geral</b>
-          </div>
-          <span className="local-tag">◉ Ambiente local</span>
-        </header>
         <div className="content">
           <div className="page-heading">
             <div>
@@ -411,7 +383,8 @@ function App() {
               );
               return (
                 <article
-                  className={`metric-card ${!online ? "muted-reading" : ""}`}
+                  className={`metric-card ${hasAlert && online ? "has-alert" : ""} ${!online ? "muted-reading" : ""}`}
+                  data-sensor={item.key}
                   key={item.key}
                 >
                   <div className="metric-top">
@@ -444,7 +417,11 @@ function App() {
             })}
           </section>
           <div className="analysis-grid">
-            <section className="panel history-panel" id="history">
+            <section
+              className="panel history-panel"
+              id="history"
+              data-sensor={metricKey}
+            >
               <div className="panel-heading">
                 <div>
                   <h2>O ritmo do ambiente</h2>
@@ -465,6 +442,7 @@ function App() {
                     key={item.key}
                     aria-pressed={metricKey === item.key}
                     className={metricKey === item.key ? "active" : ""}
+                    data-sensor={item.key}
                     onClick={() => setMetricKey(item.key)}
                   >
                     {item.key === "co2" ? "CO₂" : item.label}
@@ -473,7 +451,16 @@ function App() {
               </div>
               <Chart history={history} metric={metric} />
             </section>
-            <section className="panel alerts-panel">
+            <section
+              className="panel alerts-panel"
+              data-state={
+                !online || !matchingAlerts
+                  ? "waiting"
+                  : activeAlerts.length
+                    ? "alert"
+                    : "healthy"
+              }
+            >
               <div className="panel-heading">
                 <div>
                   <h2>Alertas do ambiente</h2>
@@ -541,6 +528,7 @@ function App() {
                   type="button"
                   key={key}
                   className={`scenario-card ${telemetry?.scenario === key ? "current" : ""}`}
+                  data-scenario={key}
                   aria-pressed={telemetry?.scenario === key}
                   disabled={
                     !online ||
@@ -577,8 +565,23 @@ function App() {
               <span className="footer-logo">▥</span> Smart Environment{" "}
               <span className="footer-divider">/</span> TP546
             </span>
-            <span>
-              Leituras sintéticas · Histórico mantido apenas nesta aba
+            <span className="footer-credits" lang="en">
+              Developed by{" "}
+              <a
+                href="https://github.com/AlvaroLucioRibeiro"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Álvaro L. A. Ribeiro
+              </a>{" "}
+              and{" "}
+              <a
+                href="https://github.com/matheusAFONSECA"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Matheus H. F. Afonso
+              </a>
             </span>
           </footer>
         </div>
