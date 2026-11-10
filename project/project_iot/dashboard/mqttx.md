@@ -1,7 +1,12 @@
 # Visualização e controle com MQTTX
 
-O MQTTX é a interface da entrega atual, conforme a alternativa permitida pelo
-enunciado. Não há servidor web, conta Blynk ou token externo necessário.
+O MQTTX é uma ferramenta auxiliar de visualização e controle, conforme a
+alternativa permitida pelo enunciado. O projeto também oferece um painel React
+em **http://localhost:3000**. Não é necessário usar conta Blynk ou token externo.
+
+Para acompanhar o broker e os payloads diretamente pelo terminal, consulte
+[Acompanhar o Mosquitto e as publicações pelo Docker](../README.md#acompanhar-o-mosquitto-e-as-publicações-pelo-docker).
+Essa opção funciona pela rede interna, sem publicar as portas do broker no host.
 
 ## Conectar
 
@@ -40,7 +45,8 @@ Em seguida, envie:
 
 Mostre a queda de CO₂ e a resolução abaixo da margem de histerese. Troque para
 `night` e mostre presença falsa e luminosidade decrescente. A leitura numérica e
-o JSON atendem à demonstração pelo MQTTX. Gráficos não foram implementados.
+o JSON atendem à demonstração pelo MQTTX. O painel React oferece gráficos das
+últimas 60 leituras, armazenadas na memória da aba.
 
 ## Retenção e dados antigos
 

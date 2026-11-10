@@ -55,6 +55,56 @@ docker compose logs --tail=20 sensor-simulator
 O guia [dashboard/mqttx.md](dashboard/mqttx.md) descreve a demonstração pelo MQTTX,
 que continua disponível como ferramenta auxiliar.
 
+### Acompanhar o Mosquitto e as publicações pelo Docker
+
+Execute os comandos abaixo dentro de `project/project_iot`. Para conferir os
+serviços e as portas publicadas:
+
+```bash
+docker compose ps
+```
+
+Para acompanhar os logs do broker e os registros de publicação do simulador:
+
+```bash
+docker compose logs --tail=30 -f mosquitto sensor-simulator
+```
+
+Os logs do Mosquitto mostram conexões, desconexões e erros conforme a configuração
+do broker. Os registros `sample_published` do simulador informam cenário, CO₂ e
+alertas ativos. Para ver o tópico e o JSON completo de cada mensagem, abra outro
+terminal e execute um assinante dentro do próprio contêiner:
+
+```bash
+docker compose exec mosquitto mosquitto_sub \
+  -h localhost \
+  -p 1883 \
+  -t 'iot/environment/room01/#' \
+  -q 1 \
+  -v
+```
+
+O `-v` exibe o tópico junto do payload. A assinatura recebe `telemetry`, `alerts`,
+`status` e eventuais `commands`. As últimas mensagens retidas aparecem imediatamente,
+seguidas das novas publicações. Confira o timestamp e o status para distinguir
+uma leitura antiga de um dispositivo conectado. Para receber somente as leituras,
+troque o tópico por `iot/environment/room01/telemetry`. Se alterar `TOPIC_PREFIX`
+ou `DEVICE_ID`, ajuste a assinatura. Encerre o acompanhamento com **Ctrl+C**.
+
+Nesse comando, `localhost:1883` aponta para o próprio contêiner Mosquitto. Não é
+necessário habilitar `compose.host-ports.yaml`. No Compose padrão, `1883/tcp` em
+`docker compose ps` indica a porta interna, enquanto `127.0.0.1:3000->80/tcp`
+indica a porta do painel publicada no computador. O acesso externo por MQTTX ou
+Python local exige o arquivo opcional de portas descrito no início deste guia.
+
+Conexões curtas e periódicas do cliente `mosquitto_pub` também podem aparecer nos
+logs: o healthcheck do broker publica em `health/broker` a cada cinco segundos.
+Essas mensagens ficam fora do prefixo `iot/environment/room01/#`.
+
+O Mosquitto não possui painel web próprio. A interface gráfica deste projeto é o
+frontend React em **http://localhost:3000**, conectado ao broker por MQTT sobre
+WebSocket via Nginx no caminho `/mqtt`.
+
 ### Desenvolvimento do frontend
 
 Com Node.js 22.12+ e npm instalados, deixe broker e simulador rodando no Docker
