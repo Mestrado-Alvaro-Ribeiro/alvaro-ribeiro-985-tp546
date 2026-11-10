@@ -1,0 +1,7 @@
+# Opcional: acesso ao broker por MQTTX, Python local ou Vite.
+# O painel Docker usa a rede interna e não precisa destas portas no host.
+services:
+  mosquitto:
+    ports:
+      - "${MQTT_BIND_ADDRESS:-127.0.0.1}:${MQTT_PORT:-1883}:1883"
+      - "127.0.0.1:${MQTT_WS_PORT:-9001}:9001"
