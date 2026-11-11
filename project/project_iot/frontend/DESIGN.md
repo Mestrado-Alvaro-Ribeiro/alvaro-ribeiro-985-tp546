@@ -45,3 +45,14 @@ irregulares. A linha liga as leituras recebidas, sem interpolar novos dados.
   briefing em lugar do tema branco de figuras científicas.
 
 O briefing explícito prevalece sobre sorteio de direção estética da Impeccable.
+
+## Alternância de tema
+O cabeçalho oferece tema claro e escuro, com escuro como padrão, independentemente
+da preferência do sistema. A escolha é salva no navegador e restaurada antes da
+renderização do dashboard. Se o armazenamento estiver indisponível, o botão
+continua funcionando durante a visita.
+
+O tema claro remapeia os mesmos tokens: fundo `#f3f6f7`, superfície branca, texto
+`#182b33`, texto secundário `#4c626e` e destaque `#176759`. Gráficos, alertas,
+seleções, foco e estados de erro usam cores específicas para cada tema. A troca
+não recarrega a página nem reinicia a conexão MQTT ou o histórico.

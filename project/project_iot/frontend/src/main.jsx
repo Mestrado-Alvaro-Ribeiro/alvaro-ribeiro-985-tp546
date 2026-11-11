@@ -13,6 +13,7 @@ import {
   Scenarios,
 } from "./components.jsx"
 import RealtimeChart from "./RealtimeChart.jsx"
+import ThemeToggle from "./ThemeToggle.jsx"
 import "./style.css"
 
 function App() {
@@ -49,7 +50,10 @@ function App() {
             <small>MONITORAMENTO AMBIENTAL</small>
           </span>
         </a>
-        <ConnectionStatus connection={connection} error={error} />
+        <div className="header-actions">
+          <ConnectionStatus connection={connection} error={error} />
+          <ThemeToggle />
+        </div>
       </header>
       <main className="content" id="overview">
         <div className="page-heading">
