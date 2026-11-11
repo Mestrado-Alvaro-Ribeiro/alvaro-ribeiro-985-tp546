@@ -28,6 +28,15 @@ O painel distingue dados antigos, dispositivo offline e falha de conexão;
 mudanças de cenário são confirmadas pela próxima telemetria do simulador.
 O histórico fica apenas na memória da aba e reinicia ao recarregar a página.
 
+O dashboard usa tema escuro, com CO₂ em destaque, resumo das condições da sala,
+status MQTT separado do estado do dispositivo e indicação LIVE apenas com dados
+atuais. Os gráficos permitem selecionar a métrica, inspecionar leituras por
+mouse, toque ou teclado e consultar uma tabela acessível. A interface inclui
+skeletons de carregamento, alertas ativos e eventos de presença e cenário.
+
+Veja a [reformulação do dashboard](docs/dashboard-redesign.md) para a comparação
+antes/depois, capturas de tela, estados da interface e limites do histórico.
+
 Por padrão, somente a porta 3000 é publicada no computador. O broker usa as
 portas 1883 e 9001 apenas dentro do Docker, evitando conflitos com um Mosquitto
 ou outro serviço já instalado. Não é necessário apagar imagens ou volumes.
