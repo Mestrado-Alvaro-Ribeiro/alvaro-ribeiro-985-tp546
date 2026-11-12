@@ -26,7 +26,7 @@ alterar os cenários de simulação.
 | `dashboard/` | Guia de conexão, visualização e comandos no MQTTX |
 | `tests/` | Testes unitários, integração MQTT e aceite do ambiente completo |
 | `docs/` | Arquitetura, hardware, mercado, viabilidade e roteiro de demonstração |
-| `presentation/` | Apresentação PowerPoint e código para regenerá-la |
+| `presentation/` | Apresentação PowerPoint |
 
 O ambiente Python usa **uv**. A versão compatível do Python, restrita à série
 **3.12**, os metadados e as dependências estão no
@@ -48,6 +48,5 @@ O comando de cópia preserva um `.env` existente. No MQTTX, conecte-se a
 
 - [Guia completo de execução, configuração e testes](project/project_iot/README.md).
 - [Apresentação PowerPoint](project/project_iot/presentation/smart-environment.pptx).
-- [Roteiro do vídeo](project/project_iot/docs/video-script.md).
 
 As leituras são simuladas. A montagem física com ESP32 é uma evolução documentada.
