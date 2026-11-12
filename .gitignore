@@ -5,3 +5,13 @@
 *.out
 *.toc
 *.synctex.gz
+
+# Python e uv do projeto IoT
+/project/project_iot/**/.venv/
+/project/project_iot/**/.env
+/project/project_iot/**/__pycache__/
+/project/project_iot/**/.pytest_cache/
+/project/project_iot/**/.ruff_cache/
+/project/project_iot/**/*.egg-info/
+/project/project_iot/**/dist/
+/project/project_iot/**/node_modules/

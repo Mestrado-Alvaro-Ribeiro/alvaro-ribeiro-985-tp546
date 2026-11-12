@@ -1,0 +1,36 @@
+[project]
+name = "smart-environment-iot"
+version = "0.1.0"
+description = "Simulação acadêmica de monitoramento ambiental com Python e MQTT"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = "MIT"
+dependencies = ["paho-mqtt>=2.1,<3", "pydantic>=2.10,<3"]
+
+[project.scripts]
+iot-simulator = "simulator.main:main"
+
+[dependency-groups]
+dev = ["pytest>=8.3,<10", "ruff>=0.9,<1"]
+presentation = ["python-pptx>=1.0,<2"]
+
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/simulator", "src/common"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: requires a running Mosquitto broker",
+    "deployment: requires the running Compose simulator and changes its scenario",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]

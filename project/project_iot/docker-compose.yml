@@ -1,0 +1,68 @@
+name: smart-environment-iot
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.0.22
+    volumes:
+      - ./mqtt/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mqtt-data:/mosquitto/data
+    networks: [iot-network]
+    healthcheck:
+      test: ["CMD", "mosquitto_pub", "-h", "localhost", "-t", "health/broker", "-m", "ok", "-q", "1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        DEVICE_ID: ${DEVICE_ID:-room01}
+        TOPIC_PREFIX: ${TOPIC_PREFIX:-iot/environment}
+        PUBLISH_INTERVAL: ${PUBLISH_INTERVAL:-5}
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      mosquitto:
+        condition: service_healthy
+    networks: [iot-network]
+    restart: unless-stopped
+    security_opt: [no-new-privileges:true]
+
+  sensor-simulator:
+    build: .
+    init: true
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: 1883
+      DEVICE_ID: ${DEVICE_ID:-room01}
+      TOPIC_PREFIX: ${TOPIC_PREFIX:-iot/environment}
+      PUBLISH_INTERVAL: ${PUBLISH_INTERVAL:-5}
+      SCENARIO: ${SCENARIO:-normal}
+      RANDOM_SEED: ${RANDOM_SEED:-42}
+      CO2_THRESHOLD: ${CO2_THRESHOLD:-1500}
+      CO2_HYSTERESIS: ${CO2_HYSTERESIS:-100}
+      TEMPERATURE_THRESHOLD: ${TEMPERATURE_THRESHOLD:-30}
+      TEMPERATURE_HYSTERESIS: ${TEMPERATURE_HYSTERESIS:-1}
+      HUMIDITY_LOW: ${HUMIDITY_LOW:-30}
+      HUMIDITY_HIGH: ${HUMIDITY_HIGH:-70}
+      HUMIDITY_HYSTERESIS: ${HUMIDITY_HYSTERESIS:-3}
+      LIGHT_THRESHOLD: ${LIGHT_THRESHOLD:-200}
+      LIGHT_HYSTERESIS: ${LIGHT_HYSTERESIS:-20}
+    depends_on:
+      mosquitto:
+        condition: service_healthy
+    networks: [iot-network]
+    restart: unless-stopped
+    stop_grace_period: 10s
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+
+networks:
+  iot-network:
+
+volumes:
+  mqtt-data:

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0d1418" />
+    <script id="theme-init">
+      (() => {
+        let theme = "dark"
+        try {
+          if (localStorage.getItem("smart-environment-theme") === "light") {
+            theme = "light"
+          }
+        } catch {
+          // Storage may be unavailable. The default remains dark.
+        }
+        document.documentElement.dataset.theme = theme
+        document.querySelector('meta[name="theme-color"]').content =
+          theme === "light" ? "#f3f6f7" : "#0d1418"
+      })()
+    </script>
+    <meta
+      name="description"
+      content="Monitoramento ambiental em tempo real do projeto Smart Environment."
+    />
+    <title>Smart Environment · Monitoramento</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
