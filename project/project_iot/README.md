@@ -34,9 +34,6 @@ atuais. Os gráficos permitem selecionar a métrica, inspecionar leituras por
 mouse, toque ou teclado e consultar uma tabela acessível. A interface inclui
 skeletons de carregamento, alertas ativos e eventos de presença e cenário.
 
-Veja a [reformulação do dashboard](docs/dashboard-redesign.md) para a comparação
-antes/depois, capturas de tela, estados da interface e limites do histórico.
-
 Por padrão, somente a porta 3000 é publicada no computador. O broker usa as
 portas 1883 e 9001 apenas dentro do Docker, evitando conflitos com um Mosquitto
 ou outro serviço já instalado. Não é necessário apagar imagens ou volumes.
@@ -323,15 +320,8 @@ O [plano de testes](docs/testing.md) inclui queda do broker e demonstração man
 - [Integração ESP32](src/physical/esp32/integration.md), com fluxo de firmware e pinagem.
 - [Componentes e montagem](docs/hardware.md).
 - [Mercado e viabilidade](docs/market.md), com fontes e limites da estimativa.
-- [Roteiro de vídeo](docs/video-script.md), com duração de até dez minutos.
 - [Apresentação PowerPoint](presentation/smart-environment.pptx).
 - [Checklist de entrega](docs/delivery.md).
-
-O hardware físico, a gravação do vídeo e a publicação dos arquivos no GitHub são
-etapas posteriores. O enunciado mostrado solicita código, PPT e link para vídeo de
-até dez minutos, com prazo de **11 de novembro de 2026 às 23:59**. O PDF mencionado
-no enunciado não foi fornecido. Estes materiais seguem os dois textos anexados e
-a captura da atividade.
 
 ## Segurança e privacidade
 
