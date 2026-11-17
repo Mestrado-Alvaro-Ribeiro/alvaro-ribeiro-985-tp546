@@ -4,7 +4,7 @@ PDF = main.pdf
 
 all: $(PDF)
 
-$(PDF): main.tex referencias.bib
+$(PDF): main.tex referencias.bib images/imagem.jpg images/imagem2.png
 	pdflatex -interaction=nonstopmode -halt-on-error main.tex
 	bibtex main
 	pdflatex -interaction=nonstopmode -halt-on-error main.tex

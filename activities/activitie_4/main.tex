@@ -8,6 +8,7 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{tabularx}
+\usepackage{graphicx}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,calc}
 \usepackage{acro}
@@ -58,6 +59,15 @@ redes veiculares, V2X, alerta de colisão, cruzamentos, latência, confiabilidad
 \section{Introdução}
 Uma edificação na esquina pode ocultar um veículo que se aproxima por uma via transversal. Nesse caso, observar somente o espaço visível à frente não informa ao condutor se outro participante chegará ao cruzamento no mesmo instante. O problema combina oclusão, mobilidade e um intervalo limitado para decidir. A comunicação \ac{v2x}, do inglês \textit{vehicle-to-everything}, permite que estados de movimento sejam recebidos antes do contato visual, oferecendo uma entrada adicional à avaliação de risco.
 
+A Figura~\ref{fig:rodovia} ilustra a comunicação entre veículos em uma rodovia. Os círculos representam conectividade de maneira conceitual, sem indicar alcance ou confiabilidade medidos. Neste trabalho, o foco se restringe a cruzamentos urbanos, onde edificações e outros veículos podem limitar a observação das trajetórias transversais.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{images/imagem.jpg}
+\caption{Representação conceitual de veículos conectados em uma rodovia. Crédito: U.S. Department of Transportation, conforme a publicação da GovTech~\cite{veen2014}.}
+\label{fig:rodovia}
+\end{figure}
+
 O alerta de risco de colisão em cruzamentos, denominado \ac{icrw}, é uma aplicação especificada pela ETSI~\cite{etsiICRW2018}. O interesse deste trabalho é o conflito entre veículos em trajetórias transversais, com obstrução da visada direta. A sigla \ac{los} indica uma situação com visada, enquanto \ac{nlos} indica sua ausência. Essa delimitação permite estudar uma aplicação concreta, em vez de tratar indistintamente todas as funções de transporte inteligente.
 
 Comunicar além do campo visual não equivale a garantir observação contínua. O receptor pode receber uma posição antiga, interpretar uma faixa incorretamente ou perder atualizações durante a aproximação. Uma comunicação rápida também pode chegar tarde se a primeira informação útil surgir quando a distância restante já for insuficiente. Por isso, a pergunta orientadora é: quais propriedades da rede precisam ser avaliadas para que um alerta cooperativo seja útil em um cruzamento sem visada direta?
@@ -84,6 +94,15 @@ O escopo contempla condutores humanos e avisos de assistência. Frenagem automá
 \section{Fundamentos da aplicação cooperativa}
 \subsection{Comunicação direta e apoio da infraestrutura}
 A comunicação \ac{v2v}, do inglês \textit{vehicle-to-vehicle}, liga participantes móveis, enquanto a comunicação \ac{v2i}, ou \textit{vehicle-to-infrastructure}, envolve equipamentos viários. Uma unidade de acostamento, \ac{rsu}, pode apoiar o serviço. Na arquitetura LTE veicular, a interface PC5 permite comunicação direta e a interface LTE-Uu conecta o terminal à rede celular. A especificação 3GPP TS 23.285 também contempla operações que combinam esses caminhos~\cite{3gpp2024}.
+
+A Figura~\ref{fig:interfaces} situa essas modalidades ao lado da comunicação com pedestres (V2P) e com a rede (V2N). O diagrama organiza os participantes, mas não determina o caminho efetivo de cada mensagem nem a tecnologia de acesso empregada.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{images/imagem2.png}
+\caption{Modalidades de comunicação V2X. Diagrama atribuído ao 3GPP na apresentação da Harris~\cite{harris2019}, slide 6, hospedada pelo NIST.}
+\label{fig:interfaces}
+\end{figure}
 
 Essa separação importa para formular o cenário. Se duas unidades trocam estados diretamente, não se deve atribuir ao percurso da mensagem uma passagem obrigatória pela nuvem. Se a decisão depender de um servidor, seu caminho de comunicação precisa entrar no orçamento de atraso e na análise de disponibilidade. A palavra ``celular'', isoladamente, não identifica a sequência de componentes atravessada por cada atualização.
 
@@ -306,8 +325,6 @@ O exemplo de movimento mostra que acrescentar espera consome distância antes da
 
 Como continuidade, propõe-se aplicar o roteiro de avaliação a trajetórias reproduzíveis, comparando padrões de perda e erros de localização sob uma mesma lógica de decisão. Uma etapa posterior deveria examinar a compreensão e a resposta dos condutores. Somente a combinação dessas evidências permitiria avançar de um alerta tecnicamente produzido para uma avaliação mais completa de sua utilidade no trânsito.
 
-% Distribui o conteúdo da última página entre as duas colunas.
-\IEEEtriggeratref{4}
 \bibliographystyle{IEEEtran}
 \bibliography{referencias}
 \end{document}

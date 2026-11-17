@@ -18,8 +18,9 @@ condução nem resultados de campo.
 
 - `main.tex`: fonte editável do artigo;
 - `main.pdf`: artigo compilado;
-- `referencias.bib`: sete referências científicas e técnicas;
+- `referencias.bib`: referências científicas, técnicas e fontes das imagens;
 - `articles/`: cópia de uma fonte aberta e links para as demais;
+- `images/`: imagens fornecidas, das quais duas são utilizadas no artigo, com fontes documentadas em `images/README.md`;
 - `materials/enunciado.md`: requisitos fornecidos;
 - `materials/evidencias.md`: localização das evidências e conferência dos cálculos;
 - `materials/planejamento.md`: recorte e critérios de preparação.
@@ -34,7 +35,9 @@ make -C activities/activitie_4
 ```
 
 O Makefile executa pdfLaTeX, BibTeX e duas passagens adicionais do pdfLaTeX.
-O diagrama é vetorial e está incorporado no arquivo LaTeX.
+O diagrama é vetorial e está incorporado no arquivo LaTeX. As duas imagens
+externas têm legendas com citações e chamadas no texto. As fontes de reprodução
+e os limites de atribuição estão documentados em [`images/README.md`](images/README.md).
 
 ## Formato
 
