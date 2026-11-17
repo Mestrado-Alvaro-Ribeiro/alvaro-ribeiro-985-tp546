@@ -15,6 +15,4 @@ citadas, sem declaração de que sejam as edições mais recentes.
 
 O PDF local de Bazzi et al. é o manuscrito disponível no arXiv. O BibTeX aponta
 também para o DOI da publicação em conferência. As demais fontes foram
-consultadas online. As tentativas de baixar diretamente o PDF do estudo
-principal e o documento ICRW receberam HTTP 403; não há cópias locais desses
-dois documentos nem arquivos de erro apresentados como PDF.
+consultadas online.

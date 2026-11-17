@@ -10,7 +10,7 @@
 \usepackage{tabularx}
 \usepackage{graphicx}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,calc}
+\usetikzlibrary{arrows.meta,positioning}
 \usepackage{acro}
 \usepackage{microtype}
 \usepackage{xurl}
@@ -72,7 +72,7 @@ O alerta de risco de colisão em cruzamentos, denominado \ac{icrw}, é uma aplic
 
 Comunicar além do campo visual não equivale a garantir observação contínua. O receptor pode receber uma posição antiga, interpretar uma faixa incorretamente ou perder atualizações durante a aproximação. Uma comunicação rápida também pode chegar tarde se a primeira informação útil surgir quando a distância restante já for insuficiente. Por isso, a pergunta orientadora é: quais propriedades da rede precisam ser avaliadas para que um alerta cooperativo seja útil em um cruzamento sem visada direta?
 
-O objetivo é relacionar as evidências de um caso experimental aos requisitos de uma cadeia completa de alerta. A contribuição é didática e analítica: separar o que foi publicado, o que pode ser deduzido sob hipóteses explícitas e o que ainda precisaria de validação. A análise utiliza estudos com comunicação LTE veicular e ITS-G5, sem transformar seus resultados em uma comparação direta entre tecnologias.
+O objetivo é relacionar as evidências de um caso experimental aos requisitos de uma cadeia completa de alerta. A contribuição é didática e analítica: separar o que foi publicado, o que pode ser deduzido sob hipóteses explícitas e o que ainda precisaria de validação. A análise utiliza estudos com comunicação LTE veicular e ITS-G5.
 
 O argumento central é que a avaliação deve acompanhar a informação desde sua obtenção até a apresentação do aviso. O sucesso de uma transmissão descreve uma etapa dessa cadeia. A utilidade para o condutor exige, adicionalmente, estado relevante, trajetória plausível e tempo de resposta. As seções seguintes apresentam o método, os fundamentos, os casos selecionados, um modelo ilustrativo e os critérios de avaliação derivados dessa perspectiva.
 
@@ -82,12 +82,12 @@ Adota-se uma revisão narrativa com estudo de caso. A seleção foi orientada po
 
 O estudo de Wang et al.~\cite{wang2021} fornece o caso experimental com a plataforma CAVTest. A avaliação de Bazzi et al.~\cite{bazzi2020} acrescenta evidência de integração entre tráfego, equipamentos e canal emulado. Gonzalez-Martin et al.~\cite{gonzalez2019} fundamentam a discussão sobre acesso autônomo ao meio. As especificações ETSI e 3GPP~\cite{etsiICRW2018,etsiCAM2019,etsiSecurity2017,3gpp2024} são empregadas para interpretar funções e interfaces, e não como prova de desempenho de um produto.
 
-As versões das especificações são registradas nas referências. Elas servem como base técnica delimitada, sem pressupor que todas sejam a edição mais recente ou que tenham sido implementadas integralmente pelos experimentos. Em particular, descrever mensagens europeias não permite atribuí-las automaticamente à pilha utilizada em outro país. A arquitetura conceitual discutida adiante organiza funções comuns, sem afirmar compatibilidade direta entre todos os sistemas citados.
+As versões das especificações são registradas nas referências, sem pressupor que sejam as mais recentes ou que tenham sido integralmente implementadas nos experimentos. A arquitetura conceitual organiza funções comuns, sem atribuir mensagens europeias à pilha de outro país nem afirmar compatibilidade entre os sistemas citados.
 
 \subsection{Critérios de interpretação}
-As evidências são separadas em três níveis. O primeiro compreende observações reportadas pelos autores dos experimentos. O segundo contém requisitos e formatos documentados por organismos de padronização. O terceiro corresponde aos cálculos ilustrativos e às recomendações analíticas deste trabalho. A distinção evita apresentar uma meta de projeto como resultado medido ou uma relação física simplificada como validação de segurança.
+As evidências são separadas em três níveis: observações reportadas pelos autores dos experimentos, requisitos e formatos documentados por organismos de padronização, e cálculos ilustrativos e recomendações analíticas deste trabalho. Essa distinção separa resultados medidos, metas de projeto e relações físicas simplificadas.
 
-A comparação entre fontes é qualitativa. Pista fechada e simulação com equipamentos reais oferecem controles diferentes sobre o ambiente. Além disso, tecnologia, geometria, algoritmo e comportamento dos condutores não são idênticos entre estudos. Não se agregam percentuais de sucesso nem se calcula uma classificação geral das tecnologias. A unidade de análise é a relação entre condição de comunicação e oportunidade do alerta.
+A comparação entre fontes é qualitativa, pois os estudos diferem em ambiente, tecnologia, geometria, algoritmo e comportamento dos condutores. Não se agregam percentuais de sucesso nem se classificam tecnologias. A unidade de análise é a relação entre condição de comunicação e oportunidade do alerta.
 
 O escopo contempla condutores humanos e avisos de assistência. Frenagem automática, coordenação de trajetórias e condução autônoma exigiriam requisitos adicionais de controle e validação. Também não se estima o número de acidentes evitados por uma implantação comercial. Essa estimativa dependeria de exposição ao risco, adesão da frota, comportamento humano e observações prolongadas, indisponíveis no presente estudo.
 
@@ -158,7 +158,7 @@ Uma consequência prática é distinguir ``último pacote recebido'' de ``últim
 \subsection{Ensaio com a plataforma CAVTest}
 Wang et al.~\cite{wang2021} avaliaram alertas com LTE-V em cruzamentos com visada, rurais e urbanos. No cenário com visada, foram consideradas comunicação sem degradação artificial e taxas de entrega impostas de 75\% e 25\%, com 100 repetições por combinação de velocidade e condição. O risco foi estimado pela proximidade dos tempos de chegada ao conflito.
 
-Os autores distinguem alerta preciso (PW), que permite frenagem parcial, alerta efetivo (EW), que exige frenagem plena, e sucesso total (SW), soma de PW e EW. A Tabela~\ref{tab:caso} reúne resultados selecionados a 40~km/h. Sucesso total elevado pode coexistir com menor proporção de avisos antecipados. Esses percentuais descrevem o protocolo publicado, sem comprovar redução de acidentes em vias públicas.
+Os autores distinguem alerta preciso (PW), que permite frenagem parcial, alerta efetivo (EW), que exige frenagem plena, e sucesso total (SW), soma de PW e EW. A Tabela~\ref{tab:caso} reúne resultados selecionados a 40~km/h sob o protocolo publicado. Sucesso total elevado pode coexistir com menor proporção de avisos antecipados.
 
 \begin{table}[t]
 \centering
@@ -190,7 +190,7 @@ Para interpretar um resultado agregado, convém perguntar qual evento conta como
 
 Também é necessário separar indisponibilidade do enlace de indisponibilidade do serviço. O enlace pode falhar em um instante sem prejudicar a decisão, caso exista uma estimativa recente e confiável. Inversamente, a recepção pode continuar enquanto a aplicação associa o estado à trajetória errada. A avaliação deve localizar a falha na cadeia antes de atribuí-la a uma suposta limitação da tecnologia.
 
-Uma conclusão de superioridade entre LTE-V e ITS-G5 exigiria controlar os demais componentes. Distâncias, potência, instalação das antenas, densidade, mensagens e limiares de decisão precisariam ser comparáveis. Os casos selecionados não constituem esse experimento controlado comum. Sua utilidade conjunta está em mostrar formas complementares de avaliar a aplicação, e não em ordenar tecnologias por um único percentual.
+Uma comparação direta entre LTE-V e ITS-G5 exigiria controlar distâncias, potência, instalação das antenas, densidade, mensagens e limiares de decisão. Como os estudos não compartilham esse protocolo experimental, sua leitura conjunta mostra formas complementares de avaliar a aplicação.
 
 \section{Análise ilustrativa da margem de reação}
 \subsection{Hipóteses e definição do conflito}

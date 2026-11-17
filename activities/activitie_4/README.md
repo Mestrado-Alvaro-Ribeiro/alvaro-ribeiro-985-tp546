@@ -20,10 +20,7 @@ condução nem resultados de campo.
 - `main.pdf`: artigo compilado;
 - `referencias.bib`: referências científicas, técnicas e fontes das imagens;
 - `articles/`: cópia de uma fonte aberta e links para as demais;
-- `images/`: imagens fornecidas, das quais duas são utilizadas no artigo, com fontes documentadas em `images/README.md`;
-- `materials/enunciado.md`: requisitos fornecidos;
-- `materials/evidencias.md`: localização das evidências e conferência dos cálculos;
-- `materials/planejamento.md`: recorte e critérios de preparação.
+- `images/`: duas imagens utilizadas no artigo, com fontes documentadas em `images/README.md`.
 
 ## Compilação
 
