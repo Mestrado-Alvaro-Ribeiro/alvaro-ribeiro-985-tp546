@@ -32,7 +32,7 @@
 \DeclareAcronym{hil}{short=HIL,long=hardware-in-the-loop}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \newcommand{\un}[1]{\,\mathrm{#1}}
-\newcommand{\changed}[1]{{\color{blue}#1}}
+\newcommand{\changed}[1]{{#1}}
 \setlength{\emergencystretch}{1em}
 
 \title{Comunicação V2X para alertas de colisão em cruzamentos sem visada direta: estudo de caso e análise dos requisitos de rede}
@@ -275,7 +275,6 @@ A expressão deixa visível o benefício potencial de múltiplas oportunidades, 
 
 \changed{Além do pico da idade, calculam-se sua média temporal $\overline{A}$ e a fração $Q_\theta$ do período observado em que a idade excede um limiar $\theta$:}
 \begin{equation}
-\color{blue}
 \begin{aligned}
 \overline{A}&=\frac{1}{H}\int_0^H A(t)\,\mathrm{d}t,\\
 Q_\theta&=\frac{1}{H}\int_0^H\mathbf{1}_{\{A(t)>\theta\}}\,\mathrm{d}t.
@@ -285,7 +284,6 @@ Q_\theta&=\frac{1}{H}\int_0^H\mathbf{1}_{\{A(t)>\theta\}}\,\mathrm{d}t.
 \changed{A função indicadora vale um quando a condição é satisfeita e zero nos demais instantes. Adota-se $\theta=0{,}25\un{s}$ apenas como parâmetro ilustrativo. Esse limiar se refere à idade do estado e não ao intervalo entre disponibilidade do dado e aviso discutido anteriormente.}
 
 \begin{table}[t]
-\color{blue}
 \centering
 \caption{Efeito da distribuição de quatro perdas em 20 mensagens. Cálculo determinístico próprio com $T=0{,}1\un{s}$ e latência de transporte nula.}
 \label{tab:padroes-perda}
