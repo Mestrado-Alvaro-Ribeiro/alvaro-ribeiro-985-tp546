@@ -8,6 +8,7 @@ citadas, sem declaração de que sejam as edições mais recentes.
 | `wang2021` | [Texto integral na editora](https://onlinelibrary.wiley.com/doi/10.1155/2021/9970978) |
 | `bazzi2020` | [Manuscrito no arXiv](https://arxiv.org/abs/2001.08068), com [cópia local em PDF](bazzi2020.pdf) |
 | `gonzalez2019` | [Manuscrito no arXiv](https://arxiv.org/abs/1807.06508) |
+| `bezmenov2024` | [Preprint no arXiv, versão 1, de 19 de dezembro de 2024](https://arxiv.org/abs/2412.14616v1). Fundamenta a distinção entre idade média e probabilidade de ultrapassar um limiar. Os números da comparação entre perdas dispersas e em rajada são cálculos próprios da atividade. |
 | `etsiICRW2018` | [ETSI TS 101 539-2 V1.1.1](https://www.etsi.org/deliver/etsi_ts/101500_101599/10153902/01.01.01_60/ts_10153902v010101p.pdf) |
 | `etsiCAM2019` | [ETSI EN 302 637-2 V1.4.1](https://www.etsi.org/deliver/etsi_en/302600_302699/30263702/01.04.01_60/en_30263702v010401p.pdf) |
 | `etsiSecurity2017` | [ETSI TS 103 097 V1.3.1](https://www.etsi.org/deliver/etsi_ts/103000_103099/103097/01.03.01_60/ts_103097v010301p.pdf) |

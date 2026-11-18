@@ -9,6 +9,7 @@
 \usepackage{array}
 \usepackage{tabularx}
 \usepackage{graphicx}
+\usepackage{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning}
 \usepackage{acro}
@@ -31,6 +32,7 @@
 \DeclareAcronym{hil}{short=HIL,long=hardware-in-the-loop}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \newcommand{\un}[1]{\,\mathrm{#1}}
+\newcommand{\changed}[1]{{\color{blue}#1}}
 \setlength{\emergencystretch}{1em}
 
 \title{Comunicação V2X para alertas de colisão em cruzamentos sem visada direta: estudo de caso e análise dos requisitos de rede}
@@ -58,6 +60,15 @@ redes veiculares, V2X, alerta de colisão, cruzamentos, latência, confiabilidad
 
 \section{Introdução}
 Uma edificação na esquina pode ocultar um veículo que se aproxima por uma via transversal. Nesse caso, observar somente o espaço visível à frente não informa ao condutor se outro participante chegará ao cruzamento no mesmo instante. O problema combina oclusão, mobilidade e um intervalo limitado para decidir. A comunicação \ac{v2x}, do inglês \textit{vehicle-to-everything}, permite que estados de movimento sejam recebidos antes do contato visual, oferecendo uma entrada adicional à avaliação de risco.
+
+\changed{A Figura~\ref{fig:cruzamento} representa a oclusão entre dois veículos em aproximação e situa a região em que suas trajetórias podem entrar em conflito.}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{images/cruzamento_obstruido.pdf}
+\caption{\changed{Cruzamento com visada obstruída por uma edificação. A e B aproximam-se da região de conflito. O quadro inferior representa a troca conceitual de estados, sem descrever um percurso de propagação nem garantir recepção. Elaboração própria.}}
+\label{fig:cruzamento}
+\end{figure}
 
 A Figura~\ref{fig:rodovia} ilustra a comunicação entre veículos em uma rodovia. Os círculos representam conectividade de maneira conceitual, sem indicar alcance ou confiabilidade medidos. Neste trabalho, o foco se restringe a cruzamentos urbanos, onde edificações e outros veículos podem limitar a observação das trajetórias transversais.
 
@@ -209,6 +220,15 @@ Se $\ell_i$ representa o percurso necessário para que o veículo libere a regi�
 \end{equation}
 A interseção $I_A\cap I_B\ne\emptyset$ indica um conflito potencial sob as hipóteses adotadas. Isso não é uma probabilidade de colisão. Alterações de velocidade, prioridade e intenção podem modificar os intervalos. Para veículos parados ou muito lentos, a divisão por velocidade torna-se inadequada e outro modelo de estado é necessário.
 
+\changed{A Figura~\ref{fig:decisao} organiza a validação, a previsão de ocupação e os resultados possíveis de um ciclo de avaliação. Uma mensagem nova rejeitada pode coexistir com um estado anterior ainda válido. O teste de disponibilidade considera esse estado e sua idade, inclusive nos ciclos sem novas mensagens.}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{images/fluxograma_alerta.pdf}
+\caption{\changed{Fluxo conceitual de avaliação do alerta, elaborado a partir das funções discutidas no estudo. A disponibilidade é verificada sobre o estado mantido após a validação. A ausência de estado utilizável conduz à informação indisponível, enquanto a ausência de conflito previsto conduz à continuidade do monitoramento. Elaboração própria, sem implementação experimental associada.}}
+\label{fig:decisao}
+\end{figure*}
+
 \subsection{Atraso convertido em distância}
 Se o veículo mantém velocidade $v$ durante uma espera $T$, percorre $vT$. Sob frenagem constante de magnitude $a>0$, a distância posterior de frenagem é $v^2/(2a)$. Logo, uma aproximação da distância necessária desde o instante em que a informação fica disponível na origem é
 \begin{equation}
@@ -250,6 +270,42 @@ Em um cenário idealizado de recepções independentes, com probabilidade $p$ po
  P_{\geq 1}=1-(1-p)^n.
 \end{equation}
 A expressão deixa visível o benefício potencial de múltiplas oportunidades, mas a independência é uma hipótese forte. Uma obstrução persistente ou um conflito recorrente de recursos pode afetar várias transmissões seguidas. Não se usa essa equação para estimar a confiabilidade do caso experimental nem para converter entrega de pacotes diretamente em prevenção de colisões.
+
+\changed{Para quantificar o efeito da ordem das perdas, considera-se um exemplo determinístico próprio com 20 mensagens geradas nos instantes $t_j=jT$, para $j=1,\ldots,20$, durante $H=2\un{s}$. Admite-se um estado válido em $t=0$, relógios sincronizados e recepção instantânea das mensagens entregues. No padrão disperso, perdem-se as mensagens de índices 4, 8, 12 e 16. Na rajada, perdem-se as de índices 8, 9, 10 e 11. Ambos entregam 16 das 20 mensagens, com \ac{pdr} de 80\%.}
+
+\changed{Além do pico da idade, calculam-se sua média temporal $\overline{A}$ e a fração $Q_\theta$ do período observado em que a idade excede um limiar $\theta$:}
+\begin{equation}
+\color{blue}
+\begin{aligned}
+\overline{A}&=\frac{1}{H}\int_0^H A(t)\,\mathrm{d}t,\\
+Q_\theta&=\frac{1}{H}\int_0^H\mathbf{1}_{\{A(t)>\theta\}}\,\mathrm{d}t.
+\end{aligned}
+\label{eq:violacao-idade}
+\end{equation}
+\changed{A função indicadora vale um quando a condição é satisfeita e zero nos demais instantes. Adota-se $\theta=0{,}25\un{s}$ apenas como parâmetro ilustrativo. Esse limiar se refere à idade do estado e não ao intervalo entre disponibilidade do dado e aviso discutido anteriormente.}
+
+\begin{table}[t]
+\color{blue}
+\centering
+\caption{Efeito da distribuição de quatro perdas em 20 mensagens. Cálculo determinístico próprio com $T=0{,}1\un{s}$ e latência de transporte nula.}
+\label{tab:padroes-perda}
+\small
+\begin{tabularx}{\columnwidth}{Yrr}
+\toprule
+Indicador & Dispersas & Rajada\\
+\midrule
+\ac{pdr} (\%) & 80 & 80\\
+Maior intervalo entre recepções (ms) & 200 & 500\\
+Pico da idade (ms) & 200 & 500\\
+Idade média $\overline{A}$ (ms) & 70 & 100\\
+Fração $Q_{0{,}25\,\mathrm{s}}$ (\%) & 0 & 12,5\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\changed{Como a idade cresce linearmente entre recepções e retorna a zero em cada entrega, um intervalo de duração $g$ contribui com área $g^2/2$ para sua integral. O padrão disperso possui quatro intervalos de 0,2~s e doze de 0,1~s. A rajada produz um intervalo de 0,5~s e quinze de 0,1~s. Nesse intervalo maior, a idade supera 0,25~s durante 0,25~s, correspondendo a 12,5\% dos 2~s observados. Os resultados estão na Tabela~\ref{tab:padroes-perda}.}
+
+\changed{A mesma entrega agregada, portanto, admite diferentes períodos de desatualização. Uma análise de acesso com reserva semipersistente para V2X também distingue idade média e probabilidade de ultrapassar um limiar, mostrando que otimizar a primeira não implica minimizar a segunda~\cite{bezmenov2024}. Aqui, $Q_\theta$ é uma fração temporal calculada para duas sequências fixas, sem estimar uma probabilidade populacional. Sua utilidade é tornar verificável a comparação entre padrões de perda. A consequência para um alerta ainda depende de quando a lacuna ocorre em relação ao conflito e da validade da trajetória prevista.}
 
 \section{Requisitos para uma avaliação da aplicação}
 \subsection{Métricas e referência temporal}

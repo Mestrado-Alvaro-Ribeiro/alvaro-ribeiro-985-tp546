@@ -14,3 +14,14 @@ As correspondências foram verificadas visualmente em 17 de novembro de 2026.
 O NIST é o hospedeiro da apresentação da Harris, e não o autor do diagrama.
 Não se presume uma licença de reutilização específica a partir da mera
 disponibilidade online.
+
+## Figuras conceituais próprias
+
+As duas figuras abaixo foram geradas com auxílio de IA para esta atividade, a partir dos conceitos já apresentados no artigo. Passaram por revisão científica e visual. São esquemas didáticos, sem resultados experimentais associados.
+
+| Figura | PNG | PDF | Função no artigo |
+|---|---|---|---|
+| Cruzamento com visada obstruída | [cruzamento_obstruido.png](cruzamento_obstruido.png) | [cruzamento_obstruido.pdf](cruzamento_obstruido.pdf) | Mostrar os veículos A e B, a edificação que bloqueia a visada e a região de conflito. O quadro de troca de estados não representa um percurso de propagação. |
+| Fluxo de avaliação do alerta | [fluxograma_alerta.png](fluxograma_alerta.png) | [fluxograma_alerta.pdf](fluxograma_alerta.pdf) | Distinguir estado utilizável, informação indisponível e conflito previsto. Uma mensagem rejeitada não implica a expiração de um estado anterior ainda válido. |
+
+Os PNGs são os originais gerados, com dimensões de 1635 × 962 e 2172 × 724 pixels, respectivamente. Cada PDF contém a mesma imagem, sem alteração dos pixels e sem margens adicionais. O artigo incorpora os PDFs. As legendas e chamadas adicionadas estão em azul para revisão.
